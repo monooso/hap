@@ -4,6 +4,8 @@ image:
 tasks:
   - name: Run tests
     init: |
+      mix local.hex --force
+      mix local.rebar --force
       mix deps.get
       MIX_ENV=test mix compile
     command: mix test
@@ -11,6 +13,8 @@ tasks:
 
   - name: Start development server
     init: |
+      mix local.hex --force
+      mix local.rebar --force
       mix deps.get
       mix compile
       mix ecto.create
