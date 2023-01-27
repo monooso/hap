@@ -29,5 +29,4 @@ vscode:
   extensions:
     - benvp.vscode-hex-pm-intellisense
     - bradlc.vscode-tailwindcss
-    - elixir-lsp.elixir-ls
     - esbenp.prettier-vscode
