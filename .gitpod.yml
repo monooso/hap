@@ -1,13 +1,6 @@
 image:
   file: .gitpod/Dockerfile
 
-tasks:
-  - name: "Phoenix Dev Server"
-    init: |
-      mix setup
-      mix compile
-    command: iex -S mix phx.server
-
 ports:
   - port: 4000
     onOpen: open-preview
