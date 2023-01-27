@@ -9,6 +9,10 @@ tasks:
       mix deps.get
       mix compile
       MIX_ENV=test mix compile
+      
+  - name: Start development server
+    command: iex -S mix phx.server
+    openMode: tab-after
 
 ports:
   - port: 4000
