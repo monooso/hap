@@ -1,6 +1,6 @@
 image:
   file: .gitpod/Dockerfile
-    
+
 tasks:
   - name: Install dependencies
     init: mix deps.get
@@ -8,7 +8,7 @@ tasks:
     init: |
       mix compile
       MIX_ENV=test mix compile
-    
+
 ports:
   - port: 4000
     onOpen: open-preview
