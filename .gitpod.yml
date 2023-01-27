@@ -2,17 +2,18 @@ image:
   file: .gitpod/Dockerfile
 
 tasks:
-  - name: Install dependencies and compile source code
+  - name: Run tests
     init: |
-      mix local.hex --force \
-      && mix local.rebar --force
-      && mix deps.get \
-      && mix compile \
-      && MIX_ENV=test mix compile \
-      && mix ecto.create
+      mix deps.get
+      MIX_ENV=test mix compile
+    command: mix test
     openMode: tab-after
-      
+
   - name: Start development server
+    init: |
+      mix deps.get
+      mix compile
+      mix ecto.create
     command: iex -S mix phx.server
     openMode: tab-after
 
