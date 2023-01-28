@@ -2,7 +2,7 @@ defmodule Hap.Factory do
   use ExMachina.Ecto, repo: Hap.Repo
 
   def organization_factory do
-    %Hap.Accounts.Organization{
+    %HapSchemas.Accounts.Organization{
       name: "Organization" |> make_unique()
     }
   end

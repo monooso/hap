@@ -8,7 +8,7 @@ defmodule Hap.Accounts.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
 
-    belongs_to :organization, Hap.Accounts.Organization
+    belongs_to :organization, HapSchemas.Accounts.Organization
 
     timestamps()
   end
