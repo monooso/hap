@@ -86,15 +86,9 @@ defmodule HapWeb do
 
   defp view_helpers do
     quote do
-      # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
-
-      # Import LiveView and .heex helpers (live_render, live_patch, <.form>, etc)
-      import Phoenix.LiveView.Helpers
-
-      # Import basic rendering functionality (render, render_layout, etc)
+      import Phoenix.Component
       import Phoenix.View
-
       import HapWeb.ErrorHelpers
       import HapWeb.Gettext
       alias HapWeb.Router.Helpers, as: Routes
