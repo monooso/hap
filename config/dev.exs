@@ -2,8 +2,8 @@ import Config
 
 # Configure your database
 config :hap, Hap.Repo,
-  username: "gitpod",
-  password: "gitpod",
+  username: "postgres",
+  password: "postgres",
   hostname: "localhost",
   database: "hap_dev",
   stacktrace: true,
