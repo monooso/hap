@@ -1,13 +1,10 @@
 defmodule Hap.AccountsFixtures do
-  import Hap.Factory
-
   def unique_user_email, do: "user#{System.unique_integer()}@example.com"
   def valid_user_password, do: "hello world!"
 
   def valid_user_attributes(attrs \\ %{}) do
     Enum.into(attrs, %{
       email: unique_user_email(),
-      organization_id: insert(:organization) |> Map.get(:id),
       password: valid_user_password()
     })
   end

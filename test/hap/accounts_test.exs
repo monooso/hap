@@ -1,7 +1,9 @@
 defmodule Hap.AccountsTest do
   use Hap.DataCase
   alias Hap.Accounts
+  alias Hap.Repo
   import Hap.AccountsFixtures
+  alias HapSchemas.Accounts.Organization
   alias HapSchemas.Accounts.User
   alias HapSchemas.Accounts.UserToken
 
@@ -48,14 +50,27 @@ defmodule Hap.AccountsTest do
   end
 
   describe "register_user/1" do
-    test "requires email, organization_id, and password to be set" do
+    test "requires email and password to be set" do
       {:error, changeset} = Accounts.register_user(%{})
+      assert %{password: ["can't be blank"], email: ["can't be blank"]} = errors_on(changeset)
+    end
 
-      assert %{
-               organization_id: ["can't be blank"],
-               password: ["can't be blank"],
-               email: ["can't be blank"]
-             } = errors_on(changeset)
+    test "it registers the user when given valid data" do
+      email = unique_user_email()
+      {:ok, user} = Accounts.register_user(valid_user_attributes(email: email))
+
+      assert user.email == email
+      assert is_binary(user.hashed_password)
+      assert is_nil(user.confirmed_at)
+      assert is_nil(user.password)
+    end
+
+    test "it automatically creates an organization when registering the user" do
+      attrs = valid_user_attributes() |> Map.put(:email, unique_user_email())
+
+      {:ok, %{organization_id: organization_id}} = Accounts.register_user(attrs)
+
+      assert Repo.get!(Organization, organization_id)
     end
 
     test "validates email and password when given" do
@@ -82,15 +97,6 @@ defmodule Hap.AccountsTest do
       # Now try with the upper cased email too, to check that email case is ignored.
       {:error, changeset} = Accounts.register_user(%{email: String.upcase(email)})
       assert "has already been taken" in errors_on(changeset).email
-    end
-
-    test "registers users with a hashed password" do
-      email = unique_user_email()
-      {:ok, user} = Accounts.register_user(valid_user_attributes(email: email))
-      assert user.email == email
-      assert is_binary(user.hashed_password)
-      assert is_nil(user.confirmed_at)
-      assert is_nil(user.password)
     end
   end
 

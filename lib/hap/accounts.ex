@@ -2,9 +2,11 @@ defmodule Hap.Accounts do
   @moduledoc false
 
   import Ecto.Query, warn: false
+  alias Ecto.Multi
   alias Hap.Repo
   alias HapSchemas.Accounts.User
   alias HapSchemas.Accounts.UserToken
+  alias Hap.Accounts.Organizations
   alias Hap.Accounts.UserNotifier
 
   ## Database getters
@@ -62,7 +64,9 @@ defmodule Hap.Accounts do
   ## User registration
 
   @doc """
-  Registers a user.
+  Registers a user, and their associated organisation.
+
+  For now, every user gets their own organisation.
 
   ## Examples
 
@@ -74,9 +78,24 @@ defmodule Hap.Accounts do
 
   """
   def register_user(attrs) do
-    %User{}
-    |> User.registration_changeset(attrs)
-    |> Repo.insert()
+    result =
+      Multi.new()
+      |> Multi.insert(
+        :organization,
+        Organizations.create_organization_changeset(%{name: "Placeholder"})
+      )
+      |> Multi.run(:user, fn _repo, %{organization: organization} ->
+        Ecto.build_assoc(organization, :users)
+        |> User.registration_changeset(attrs)
+        |> Repo.insert()
+      end)
+      |> Repo.transaction()
+
+    case result do
+      {:ok, %{user: user}} -> {:ok, user}
+      {:error, :user, changeset, _changes_so_far} -> {:error, changeset}
+      _ -> raise "Error creating organisation"
+    end
   end
 
   @doc """
