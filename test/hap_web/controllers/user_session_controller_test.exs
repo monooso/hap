@@ -1,6 +1,5 @@
 defmodule HapWeb.UserSessionControllerTest do
   use HapWeb.ConnCase, async: true
-
   import Hap.AccountsFixtures
 
   setup do

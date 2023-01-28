@@ -1,12 +1,11 @@
 defmodule Hap.Accounts do
-  @moduledoc """
-  The Accounts context.
-  """
+  @moduledoc false
 
   import Ecto.Query, warn: false
   alias Hap.Repo
-
-  alias Hap.Accounts.{User, UserToken, UserNotifier}
+  alias HapSchemas.Accounts.User
+  alias HapSchemas.Accounts.UserToken
+  alias Hap.Accounts.UserNotifier
 
   ## Database getters
 

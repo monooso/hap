@@ -1,6 +1,8 @@
-defmodule Hap.Accounts.User do
+defmodule HapSchemas.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
+  alias HapSchemas.Accounts.User
+  alias HapSchemas.Accounts.Organization
 
   schema "users" do
     field :email, :string
@@ -8,7 +10,7 @@ defmodule Hap.Accounts.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
 
-    belongs_to :organization, HapSchemas.Accounts.Organization
+    belongs_to :organization, Organization
 
     timestamps()
   end
@@ -136,7 +138,7 @@ defmodule Hap.Accounts.User do
   If there is no user or the user doesn't have a password, we call
   `Bcrypt.no_user_verify/0` to avoid timing attacks.
   """
-  def valid_password?(%Hap.Accounts.User{hashed_password: hashed_password}, password)
+  def valid_password?(%User{hashed_password: hashed_password}, password)
       when is_binary(hashed_password) and byte_size(password) > 0 do
     Bcrypt.verify_pass(password, hashed_password)
   end

@@ -2,7 +2,7 @@ defmodule HapWeb.UserRegistrationController do
   use HapWeb, :controller
 
   alias Hap.Accounts
-  alias Hap.Accounts.User
+  alias HapSchemas.Accounts.User
   alias HapWeb.UserAuth
 
   def new(conn, _params) do
