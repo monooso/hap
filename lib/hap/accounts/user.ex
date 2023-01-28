@@ -8,6 +8,8 @@ defmodule Hap.Accounts.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
 
+    belongs_to :organization, Hap.Accounts.Organization
+
     timestamps()
   end
 
@@ -30,9 +32,10 @@ defmodule Hap.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:email, :organization_id, :password])
     |> validate_email()
     |> validate_password(opts)
+    |> validate_organization()
   end
 
   defp validate_email(changeset) do
@@ -42,6 +45,12 @@ defmodule Hap.Accounts.User do
     |> validate_length(:email, max: 160)
     |> unsafe_validate_unique(:email, Hap.Repo)
     |> unique_constraint(:email)
+  end
+
+  defp validate_organization(changeset) do
+    changeset
+    |> validate_required([:organization_id])
+    |> assoc_constraint(:organization)
   end
 
   defp validate_password(changeset, opts) do
@@ -67,6 +76,16 @@ defmodule Hap.Accounts.User do
     else
       changeset
     end
+  end
+
+  @doc """
+  A user changeset for updating the user's data.
+  """
+  def update_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:email, :password])
+    |> validate_email()
+    |> validate_password(hash_password: false)
   end
 
   @doc """

@@ -49,10 +49,11 @@ defmodule Hap.AccountsTest do
   end
 
   describe "register_user/1" do
-    test "requires email and password to be set" do
+    test "requires email, organization_id, and password to be set" do
       {:error, changeset} = Accounts.register_user(%{})
 
       assert %{
+               organization_id: ["can't be blank"],
                password: ["can't be blank"],
                email: ["can't be blank"]
              } = errors_on(changeset)

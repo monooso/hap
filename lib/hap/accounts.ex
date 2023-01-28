@@ -90,7 +90,7 @@ defmodule Hap.Accounts do
 
   """
   def change_user_registration(%User{} = user, attrs \\ %{}) do
-    User.registration_changeset(user, attrs, hash_password: false)
+    User.update_changeset(user, attrs)
   end
 
   ## Settings

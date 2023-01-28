@@ -1,8 +1,5 @@
 defmodule Hap.AccountsFixtures do
-  @moduledoc """
-  This module defines test helpers for creating
-  entities via the `Hap.Accounts` context.
-  """
+  import Hap.Factory
 
   def unique_user_email, do: "user#{System.unique_integer()}@example.com"
   def valid_user_password, do: "hello world!"
@@ -10,6 +7,7 @@ defmodule Hap.AccountsFixtures do
   def valid_user_attributes(attrs \\ %{}) do
     Enum.into(attrs, %{
       email: unique_user_email(),
+      organization_id: insert(:organization) |> Map.get(:id),
       password: valid_user_password()
     })
   end
