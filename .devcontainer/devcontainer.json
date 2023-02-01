@@ -1,0 +1,20 @@
+{
+  "name": "Hap",
+  "dockerComposeFile": [
+    "docker-compose.yml"
+  ],
+  "service": "phoenix",
+  "workspaceFolder": "/workspace",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "bradlc.vscode-tailwindcss",
+        "EditorConfig.EditorConfig",
+        "jakebecker.elixir-ls"
+      ]
+    }
+  },
+  "forwardPorts": [
+    4000
+  ]
+}

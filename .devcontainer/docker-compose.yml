@@ -1,0 +1,18 @@
+services:
+  phoenix:
+    container_name: phoenix
+    build:
+      context: .
+      dockerfile: "phoenix-dockerfile"
+    stdin_open: true
+    tty: true
+    volumes:
+      - ..:/workspace:cached
+
+  postgres:
+    container_name: postgres
+    image: "postgres:15.1"
+    ports: [ "5454:5432" ]
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
