@@ -19,15 +19,15 @@ defmodule HapWeb.ConnCase do
 
   using do
     quote do
+      # The default endpoint for testing
+      @endpoint HapWeb.Endpoint
+
+      use HapWeb, :verified_routes
+
       # Import conveniences for testing with connections
       import Plug.Conn
       import Phoenix.ConnTest
       import HapWeb.ConnCase
-
-      alias HapWeb.Router.Helpers, as: Routes
-
-      # The default endpoint for testing
-      @endpoint HapWeb.Endpoint
     end
   end
 

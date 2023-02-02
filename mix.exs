@@ -5,9 +5,8 @@ defmodule Hap.MixProject do
     [
       app: :hap,
       version: "0.1.0",
-      elixir: "~> 1.12",
+      elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
-      compilers: Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps()
@@ -34,23 +33,26 @@ defmodule Hap.MixProject do
   defp deps do
     [
       {:bcrypt_elixir, "~> 3.0"},
-      {:phoenix, "~> 1.6.15"},
-      {:phoenix_ecto, "~> 4.4"},
-      {:ecto_sql, "~> 3.9"},
+      {:ecto_sql, "~> 3.6"},
+      {:esbuild, "~> 0.5", runtime: Mix.env() == :dev},
       {:ex_machina, "~> 2.7.0", only: :test},
-      {:postgrex, ">= 0.0.0"},
-      {:phoenix_html, "~> 3.2"},
-      {:phoenix_live_reload, "~> 1.4", only: :dev},
-      {:phoenix_live_view, "~> 0.18"},
-      {:floki, ">= 0.34.0", only: :test},
-      {:phoenix_live_dashboard, "~> 0.7"},
-      {:esbuild, "~> 0.4", runtime: Mix.env() == :dev},
-      {:swoosh, "~> 1.3"},
-      {:telemetry_metrics, "~> 0.6"},
-      {:telemetry_poller, "~> 1.0"},
-      {:gettext, "~> 0.18"},
+      {:finch, "~> 0.13"},
+      {:floki, ">= 0.30.0", only: :test},
+      {:gettext, "~> 0.20"},
+      {:heroicons, "~> 0.5"},
       {:jason, "~> 1.2"},
-      {:plug_cowboy, "~> 2.5"}
+      {:phoenix, "~> 1.7.0-rc.2", override: true},
+      {:phoenix_ecto, "~> 4.4"},
+      {:phoenix_html, "~> 3.0"},
+      {:phoenix_live_dashboard, "~> 0.7.2"},
+      {:phoenix_live_reload, "~> 1.2", only: :dev},
+      {:phoenix_live_view, "~> 0.18.3"},
+      {:plug_cowboy, "~> 2.5"},
+      {:postgrex, ">= 0.0.0"},
+      {:swoosh, "~> 1.3"},
+      {:tailwind, "~> 0.1.8", runtime: Mix.env() == :dev},
+      {:telemetry_metrics, "~> 0.6"},
+      {:telemetry_poller, "~> 1.0"}
     ]
   end
 
@@ -62,11 +64,12 @@ defmodule Hap.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get", "ecto.setup"],
+      setup: ["deps.get", "ecto.setup", "assets.setup"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
-      "assets.deploy": ["esbuild default --minify", "phx.digest"]
+      "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
+      "assets.deploy": ["tailwind default --minify", "esbuild default --minify", "phx.digest"]
     ]
   end
 end

@@ -1,8 +1,8 @@
 defmodule HapSchemas.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
-  alias HapSchemas.Accounts.User
   alias HapSchemas.Accounts.Organization
+  alias HapSchemas.Accounts.User
 
   schema "users" do
     field :email, :string
@@ -31,22 +31,27 @@ defmodule HapSchemas.Accounts.User do
       password field is not desired (like when using this changeset for
       validations on a LiveView form), this option can be set to `false`.
       Defaults to `true`.
+
+    * `:validate_email` - Validates the uniqueness of the email, in case
+      you don't want to validate the uniqueness of the email (like when
+      using this changeset for validations on a LiveView form before
+      submitting the form), this option can be set to `false`.
+      Defaults to `true`.
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
     |> cast(attrs, [:email, :organization_id, :password])
-    |> validate_email()
-    |> validate_password(opts)
+    |> validate_email(opts)
     |> validate_organization()
+    |> validate_password(opts)
   end
 
-  defp validate_email(changeset) do
+  defp validate_email(changeset, opts) do
     changeset
     |> validate_required([:email])
     |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
     |> validate_length(:email, max: 160)
-    |> unsafe_validate_unique(:email, Hap.Repo)
-    |> unique_constraint(:email)
+    |> maybe_validate_unique_email(opts)
   end
 
   defp validate_organization(changeset) do
@@ -80,13 +85,32 @@ defmodule HapSchemas.Accounts.User do
     end
   end
 
+  defp maybe_validate_unique_email(changeset, opts) do
+    if Keyword.get(opts, :validate_email, true) do
+      changeset
+      |> unsafe_validate_unique(:email, Hap.Repo)
+      |> unique_constraint(:email)
+    else
+      changeset
+    end
+  end
+
   @doc """
   A user changeset for updating the user's data.
+
+  ## Options
+
+    * `:validate_email` - Validates the uniqueness of the email, in case
+      you don't want to validate the uniqueness of the email (like when
+      using this changeset for validations on a LiveView form before
+      submitting the form), this option can be set to `false`.
+      Defaults to `true`.
+
   """
-  def update_changeset(user, attrs) do
+  def update_changeset(user, attrs, opts \\ []) do
     user
     |> cast(attrs, [:email, :password])
-    |> validate_email()
+    |> validate_email(opts)
     |> validate_password(hash_password: false)
   end
 
@@ -95,10 +119,10 @@ defmodule HapSchemas.Accounts.User do
 
   It requires the email to change otherwise an error is added.
   """
-  def email_changeset(user, attrs) do
+  def email_changeset(user, attrs, opts \\ []) do
     user
     |> cast(attrs, [:email])
-    |> validate_email()
+    |> validate_email(opts)
     |> case do
       %{changes: %{email: _}} = changeset -> changeset
       %{} = changeset -> add_error(changeset, :email, "did not change")

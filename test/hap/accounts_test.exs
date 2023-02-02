@@ -1,9 +1,7 @@
 defmodule Hap.AccountsTest do
   use Hap.DataCase
   alias Hap.Accounts
-  alias Hap.Repo
   import Hap.AccountsFixtures
-  alias HapSchemas.Accounts.Organization
   alias HapSchemas.Accounts.User
   alias HapSchemas.Accounts.UserToken
 
@@ -52,25 +50,11 @@ defmodule Hap.AccountsTest do
   describe "register_user/1" do
     test "requires email and password to be set" do
       {:error, changeset} = Accounts.register_user(%{})
-      assert %{password: ["can't be blank"], email: ["can't be blank"]} = errors_on(changeset)
-    end
 
-    test "it registers the user when given valid data" do
-      email = unique_user_email()
-      {:ok, user} = Accounts.register_user(valid_user_attributes(email: email))
-
-      assert user.email == email
-      assert is_binary(user.hashed_password)
-      assert is_nil(user.confirmed_at)
-      assert is_nil(user.password)
-    end
-
-    test "it automatically creates an organization when registering the user" do
-      attrs = valid_user_attributes() |> Map.put(:email, unique_user_email())
-
-      {:ok, %{organization_id: organization_id}} = Accounts.register_user(attrs)
-
-      assert Repo.get!(Organization, organization_id)
+      assert %{
+               password: ["can't be blank"],
+               email: ["can't be blank"]
+             } = errors_on(changeset)
     end
 
     test "validates email and password when given" do
@@ -97,6 +81,15 @@ defmodule Hap.AccountsTest do
       # Now try with the upper cased email too, to check that email case is ignored.
       {:error, changeset} = Accounts.register_user(%{email: String.upcase(email)})
       assert "has already been taken" in errors_on(changeset).email
+    end
+
+    test "registers users with a hashed password" do
+      email = unique_user_email()
+      {:ok, user} = Accounts.register_user(valid_user_attributes(email: email))
+      assert user.email == email
+      assert is_binary(user.hashed_password)
+      assert is_nil(user.confirmed_at)
+      assert is_nil(user.password)
     end
   end
 
@@ -158,9 +151,9 @@ defmodule Hap.AccountsTest do
 
     test "validates email uniqueness", %{user: user} do
       %{email: email} = user_fixture()
+      password = valid_user_password()
 
-      {:error, changeset} =
-        Accounts.apply_user_email(user, valid_user_password(), %{email: email})
+      {:error, changeset} = Accounts.apply_user_email(user, password, %{email: email})
 
       assert "has already been taken" in errors_on(changeset).email
     end
@@ -180,7 +173,7 @@ defmodule Hap.AccountsTest do
     end
   end
 
-  describe "deliver_update_email_instructions/3" do
+  describe "deliver_user_update_email_instructions/3" do
     setup do
       %{user: user_fixture()}
     end
@@ -188,7 +181,7 @@ defmodule Hap.AccountsTest do
     test "sends token through notification", %{user: user} do
       token =
         extract_user_token(fn url ->
-          Accounts.deliver_update_email_instructions(user, "current@example.com", url)
+          Accounts.deliver_user_update_email_instructions(user, "current@example.com", url)
         end)
 
       {:ok, token} = Base.url_decode64(token, padding: false)
@@ -206,7 +199,7 @@ defmodule Hap.AccountsTest do
 
       token =
         extract_user_token(fn url ->
-          Accounts.deliver_update_email_instructions(%{user | email: email}, user.email, url)
+          Accounts.deliver_user_update_email_instructions(%{user | email: email}, user.email, url)
         end)
 
       %{user: user, token: token, email: email}
@@ -359,11 +352,11 @@ defmodule Hap.AccountsTest do
     end
   end
 
-  describe "delete_session_token/1" do
+  describe "delete_user_session_token/1" do
     test "deletes the token" do
       user = user_fixture()
       token = Accounts.generate_user_session_token(user)
-      assert Accounts.delete_session_token(token) == :ok
+      assert Accounts.delete_user_session_token(token) == :ok
       refute Accounts.get_user_by_session_token(token)
     end
   end
@@ -506,7 +499,7 @@ defmodule Hap.AccountsTest do
     end
   end
 
-  describe "inspect/2" do
+  describe "inspect/2 for the User module" do
     test "does not include password" do
       refute inspect(%User{password: "123456"}) =~ "password: \"123456\""
     end

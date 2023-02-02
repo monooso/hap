@@ -1,7 +1,6 @@
 defmodule HapSchemas.Accounts.UserToken do
   use Ecto.Schema
   import Ecto.Query
-  alias HapSchemas.Accounts.User
   alias HapSchemas.Accounts.UserToken
 
   @hash_algorithm :sha256
@@ -18,7 +17,7 @@ defmodule HapSchemas.Accounts.UserToken do
     field :token, :binary
     field :context, :string
     field :sent_to, :string
-    belongs_to :user, User
+    belongs_to :user, HapSchemas.Accounts.User
 
     timestamps(updated_at: false)
   end

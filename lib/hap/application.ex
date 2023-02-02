@@ -8,12 +8,14 @@ defmodule Hap.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      # Start the Ecto repository
-      Hap.Repo,
       # Start the Telemetry supervisor
       HapWeb.Telemetry,
+      # Start the Ecto repository
+      Hap.Repo,
       # Start the PubSub system
       {Phoenix.PubSub, name: Hap.PubSub},
+      # Start Finch
+      {Finch, name: Hap.Finch},
       # Start the Endpoint (http/https)
       HapWeb.Endpoint
       # Start a worker by calling: Hap.Worker.start_link(arg)

@@ -1,13 +1,15 @@
 defmodule Hap.Accounts do
-  @moduledoc false
+  @moduledoc """
+  The Accounts context.
+  """
 
   import Ecto.Query, warn: false
   alias Ecto.Multi
   alias Hap.Repo
-  alias HapSchemas.Accounts.User
-  alias HapSchemas.Accounts.UserToken
   alias Hap.Accounts.Organizations
   alias Hap.Accounts.UserNotifier
+  alias HapSchemas.Accounts.User
+  alias HapSchemas.Accounts.UserToken
 
   ## Database getters
 
@@ -64,18 +66,7 @@ defmodule Hap.Accounts do
   ## User registration
 
   @doc """
-  Registers a user, and their associated organisation.
-
-  For now, every user gets their own organisation.
-
-  ## Examples
-
-      iex> register_user(%{field: value})
-      {:ok, %User{}}
-
-      iex> register_user(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
+  Registers a user, and creates a placeholder organization.
   """
   def register_user(attrs) do
     result =
@@ -123,7 +114,7 @@ defmodule Hap.Accounts do
 
   """
   def change_user_email(user, attrs \\ %{}) do
-    User.email_changeset(user, attrs)
+    User.email_changeset(user, attrs, validate_email: false)
   end
 
   @doc """
@@ -175,16 +166,16 @@ defmodule Hap.Accounts do
     |> Ecto.Multi.delete_all(:tokens, UserToken.user_and_contexts_query(user, [context]))
   end
 
-  @doc """
+  @doc ~S"""
   Delivers the update email instructions to the given user.
 
   ## Examples
 
-      iex> deliver_update_email_instructions(user, current_email, &Routes.user_update_email_url(conn, :edit, &1))
+      iex> deliver_user_update_email_instructions(user, current_email, &url(~p"/users/settings/confirm_email/#{&1})")
       {:ok, %{to: ..., body: ...}}
 
   """
-  def deliver_update_email_instructions(%User{} = user, current_email, update_email_url_fun)
+  def deliver_user_update_email_instructions(%User{} = user, current_email, update_email_url_fun)
       when is_function(update_email_url_fun, 1) do
     {encoded_token, user_token} = UserToken.build_email_token(user, "change:#{current_email}")
 
@@ -255,22 +246,22 @@ defmodule Hap.Accounts do
   @doc """
   Deletes the signed token with the given context.
   """
-  def delete_session_token(token) do
+  def delete_user_session_token(token) do
     Repo.delete_all(UserToken.token_and_context_query(token, "session"))
     :ok
   end
 
   ## Confirmation
 
-  @doc """
+  @doc ~S"""
   Delivers the confirmation email instructions to the given user.
 
   ## Examples
 
-      iex> deliver_user_confirmation_instructions(user, &Routes.user_confirmation_url(conn, :edit, &1))
+      iex> deliver_user_confirmation_instructions(user, &url(~p"/users/confirm/#{&1}"))
       {:ok, %{to: ..., body: ...}}
 
-      iex> deliver_user_confirmation_instructions(confirmed_user, &Routes.user_confirmation_url(conn, :edit, &1))
+      iex> deliver_user_confirmation_instructions(confirmed_user, &url(~p"/users/confirm/#{&1}"))
       {:error, :already_confirmed}
 
   """
@@ -309,12 +300,12 @@ defmodule Hap.Accounts do
 
   ## Reset password
 
-  @doc """
+  @doc ~S"""
   Delivers the reset password email to the given user.
 
   ## Examples
 
-      iex> deliver_user_reset_password_instructions(user, &Routes.user_reset_password_url(conn, :edit, &1))
+      iex> deliver_user_reset_password_instructions(user, &url(~p"/users/reset_password/#{&1}"))
       {:ok, %{to: ..., body: ...}}
 
   """
