@@ -14,6 +14,9 @@ hap-*.tar
 # When using devcontainers, we store the database files locally. Ignore them.
 /db_data
 
+# devcontainers have an annoying habit of dumping things in a /tmp directory.
+/tmp
+
 # In case you use Node.js/npm, you want to ignore these.
 npm-debug.log
 /assets/node_modules/
