@@ -6,11 +6,12 @@ services:
       dockerfile: "phoenix-dockerfile"
     stdin_open: true
     tty: true
+    working_dir: /usr/src/hap
     volumes:
-      - ..:/workspace:cached
-      - elixir-build:/workspace/_build
-      - elixir-deps:/workspace/deps
-      - elixir-ls:/workspace/.elixir_ls
+      - ..:/usr/src/hap
+      - elixir-build:/usr/src/hap/_build
+      - elixir-deps:/usr/src/hap/deps
+      - elixir-ls:/usr/src/hap/.elixir_ls
 
   postgres:
     container_name: postgres
