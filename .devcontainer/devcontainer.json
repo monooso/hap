@@ -4,7 +4,7 @@
     "docker-compose.yml"
   ],
   "service": "phoenix",
-  "workspaceFolder": "/workspace",
+  "workspaceFolder": "/usr/src/hap",
   "customizations": {
     "vscode": {
       "extensions": [
