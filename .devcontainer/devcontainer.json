@@ -10,6 +10,7 @@
       "extensions": [
         "bradlc.vscode-tailwindcss",
         "EditorConfig.EditorConfig",
+        "esbenp.prettier-vscode",
         "jakebecker.elixir-ls"
       ]
     }
