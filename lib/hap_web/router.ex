@@ -82,4 +82,13 @@ defmodule HapWeb.Router do
       live "/users/confirm", UserConfirmationInstructionsLive, :new
     end
   end
+
+  scope "/projects", HapWeb.Projects do
+    pipe_through [:browser]
+
+    live_session :projects,
+      on_mount: [{HapWeb.UserAuth, :ensure_authenticated}] do
+      live "/", BrowseLive, :browse
+    end
+  end
 end
