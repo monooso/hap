@@ -26,6 +26,13 @@ defmodule Hap.Projects do
     do: Project.insert_changeset(%Project{}, attrs)
 
   @doc """
+  Returns the project associated with the given API key.
+  """
+  @spec get_project_by_api_key(Ecto.UUID.t()) :: Project.t()
+  def get_project_by_api_key(api_key),
+    do: Repo.get_by(Project, api_key: api_key)
+
+  @doc """
   Returns a list of projects belonging to the given organization.
   """
   @spec list_projects_by_organization(Ecto.UUID.t() | Organization.t()) :: list(Project.t())

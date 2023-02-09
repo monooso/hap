@@ -30,6 +30,17 @@ defmodule Hap.ProjectsTest do
     end
   end
 
+  describe "get_project_by_api_key/1" do
+    test "it returns the project associated with the given API key" do
+      %{id: project_id, api_key: api_key} = insert(:project)
+      assert %Project{id: ^project_id} = Projects.get_project_by_api_key(api_key)
+    end
+
+    test "it returns nil if the project does not exist" do
+      assert Ecto.UUID.generate() |> Projects.get_project_by_api_key() |> is_nil()
+    end
+  end
+
   describe "list_projects_by_organization/1" do
     test "it returns a list of project structs" do
       organization = insert(:organization)
