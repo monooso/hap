@@ -3,7 +3,36 @@ defmodule Hap.ProjectsTest do
   import Hap.Factory
   alias Ecto.Changeset
   alias Hap.Projects
+  alias HapSchemas.Projects.Event
   alias HapSchemas.Projects.Project
+
+  describe "create_event/2" do
+    setup do
+      [
+        project: insert(:project),
+        valid_attrs: %{
+          "name" => "Order Received",
+          "message" => "We have a new order!",
+          "tags" => ["kpi", "sales"],
+          "metadata" => %{
+            "customer_id" => 123,
+            "order_id" => 456,
+            "order_total" => 99.87,
+            "order_status" => "received",
+            "free_shipping" => true
+          }
+        }
+      ]
+    end
+
+    test "it returns an {:ok, %Event{}} tuple on success", %{project: project, valid_attrs: attrs} do
+      assert {:ok, %Event{}} = Projects.create_event(project, attrs)
+    end
+
+    test "it returns an {:error, %Changeset{}} tuple on failure", %{project: project} do
+      assert {:error, %Changeset{}} = Projects.create_event(project, %{})
+    end
+  end
 
   describe "create_project/1" do
     setup do

@@ -5,14 +5,16 @@ defmodule HapSchemas.Projects.Project do
   import Ecto.Changeset
   alias Ecto.Changeset
   alias HapSchemas.Accounts.Organization
+  alias HapSchemas.Projects.Event
 
-  @type t :: %__MODULE__{}
+  @type t() :: %__MODULE__{}
 
   schema "projects" do
     field :api_key, :string
     field :name, :string
 
     belongs_to :organization, Organization
+    has_many :events, Event
 
     timestamps()
   end

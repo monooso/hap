@@ -5,7 +5,18 @@ defmodule Hap.Projects do
   alias Ecto.Changeset
   alias Hap.Repo
   alias HapSchemas.Accounts.Organization
+  alias HapSchemas.Projects.Event
   alias HapSchemas.Projects.Project
+
+  @doc """
+  Creates an event for the given project with the given attributes.
+  """
+  @spec create_event(Project.t(), map()) :: {:ok, Event.t()} | {:error, Changeset.t()}
+  def create_event(project, attrs) do
+    Ecto.build_assoc(project, :events)
+    |> Event.insert_changeset(attrs)
+    |> Repo.insert()
+  end
 
   @doc """
   Creates a project with the given attributes.

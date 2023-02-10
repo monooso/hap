@@ -1,5 +1,5 @@
 defmodule HapSchemas.Projects.ProjectTest do
-  use Hap.DataCase
+  use Hap.DataCase, async: true
   import Hap.Factory
   alias Ecto.Changeset
   alias Hap.Repo
@@ -71,7 +71,7 @@ defmodule HapSchemas.Projects.ProjectTest do
       assert %{organization_id: ["can't be blank"]} = errors_on(changeset)
     end
 
-    test "the organization_id attribute must refer to a known organization", %{valid_attrs: attrs} do
+    test "the organization_id must refer to a known organization", %{valid_attrs: attrs} do
       attrs = %{attrs | organization_id: 12345}
 
       {:error, changeset} = %Project{} |> Project.insert_changeset(attrs) |> Repo.insert()

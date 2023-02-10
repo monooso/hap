@@ -17,6 +17,11 @@ defmodule HapWeb.Router do
     plug :accepts, ["json"]
   end
 
+  scope "/api", HapWeb.Api do
+    pipe_through :api
+    post "/events", Events, :create
+  end
+
   scope "/", HapWeb do
     pipe_through :browser
 
