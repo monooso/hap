@@ -3,7 +3,6 @@ defmodule HapWeb.Projects.BrowseLiveTest do
   import Hap.AccountsFixtures
   import Hap.Factory
   import Phoenix.LiveViewTest
-  alias Hap.Accounts
 
   describe "logged-out user" do
     test "it redirects if the user is not logged-in", %{conn: conn} do
