@@ -72,7 +72,7 @@ defmodule HapSchemas.Projects.ProjectTest do
     end
 
     test "the organization_id must refer to a known organization", %{valid_attrs: attrs} do
-      attrs = %{attrs | organization_id: 12345}
+      attrs = %{attrs | organization_id: 12_345}
 
       {:error, changeset} = %Project{} |> Project.insert_changeset(attrs) |> Repo.insert()
 

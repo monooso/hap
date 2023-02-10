@@ -1,4 +1,6 @@
 defmodule HapSchemas.Accounts.Organization do
+  @moduledoc false
+
   use Ecto.Schema
   import Ecto.Changeset
   alias Ecto.Changeset
@@ -7,9 +9,9 @@ defmodule HapSchemas.Accounts.Organization do
   @type t() :: %__MODULE__{}
 
   schema "organizations" do
-    field :name, :string
+    field(:name, :string)
 
-    has_many :users, User
+    has_many(:users, User)
 
     timestamps()
   end

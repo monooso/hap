@@ -1,9 +1,9 @@
 defmodule HapWeb.UserAuth do
-  use HapWeb, :verified_routes
+  @moduledoc false
 
+  use HapWeb, :verified_routes
   import Plug.Conn
   import Phoenix.Controller
-
   alias Hap.Accounts
 
   # Make the remember me cookie valid for 60 days.

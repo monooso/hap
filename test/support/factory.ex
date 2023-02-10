@@ -1,4 +1,6 @@
 defmodule Hap.Factory do
+  @moduledoc "Test helper factory functions."
+
   use ExMachina.Ecto, repo: Hap.Repo
 
   def organization_factory do

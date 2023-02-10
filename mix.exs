@@ -33,6 +33,7 @@ defmodule Hap.MixProject do
   defp deps do
     [
       {:bcrypt_elixir, "~> 3.0"},
+      {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:ecto_sql, "~> 3.6"},
       {:esbuild, "~> 0.5", runtime: Mix.env() == :dev},
       {:ex_machina, "~> 2.7.0", only: :test},

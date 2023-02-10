@@ -1,16 +1,18 @@
 defmodule HapSchemas.Accounts.User do
+  @moduledoc false
+
   use Ecto.Schema
   import Ecto.Changeset
   alias HapSchemas.Accounts.Organization
   alias HapSchemas.Accounts.User
 
   schema "users" do
-    field :email, :string
-    field :password, :string, virtual: true, redact: true
-    field :hashed_password, :string, redact: true
-    field :confirmed_at, :naive_datetime
+    field(:email, :string)
+    field(:password, :string, virtual: true, redact: true)
+    field(:hashed_password, :string, redact: true)
+    field(:confirmed_at, :naive_datetime)
 
-    belongs_to :organization, Organization
+    belongs_to(:organization, Organization)
 
     timestamps()
   end
