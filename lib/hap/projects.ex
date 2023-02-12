@@ -13,9 +13,15 @@ defmodule Hap.Projects do
   """
   @spec create_event(Project.t(), map()) :: {:ok, Event.t()} | {:error, Changeset.t()}
   def create_event(project, attrs) do
-    Ecto.build_assoc(project, :events)
-    |> Event.insert_changeset(attrs)
-    |> Repo.insert()
+    changeset = project |> Ecto.build_assoc(:events) |> Event.insert_changeset(attrs)
+
+    changeset =
+      case changeset.valid? do
+        true -> changeset |> normalize_tags_changes()
+        false -> changeset
+      end
+
+    Repo.insert(changeset)
   end
 
   @doc """
@@ -52,5 +58,14 @@ defmodule Hap.Projects do
 
   def list_projects_by_organization(organization_id) do
     from(p in Project, where: p.organization_id == ^organization_id) |> Repo.all()
+  end
+
+  @spec normalize_tags_changes(Changeset.t()) :: Changeset.t()
+  defp normalize_tags_changes(changeset) do
+    tags =
+      Changeset.get_change(changeset, :tags, [])
+      |> Enum.map(&(&1 |> String.trim() |> String.downcase()))
+
+    Changeset.put_change(changeset, :tags, tags)
   end
 end

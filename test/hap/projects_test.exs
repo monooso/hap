@@ -1,5 +1,5 @@
 defmodule Hap.ProjectsTest do
-  use Hap.DataCase
+  use Hap.DataCase, async: true
   import Hap.Factory
   alias Ecto.Changeset
   alias Hap.Projects
@@ -31,6 +31,13 @@ defmodule Hap.ProjectsTest do
 
     test "it returns an {:error, %Changeset{}} tuple on failure", %{project: project} do
       assert {:error, %Changeset{}} = Projects.create_event(project, %{})
+    end
+
+    test "it normalizes the tags", %{project: project, valid_attrs: attrs} do
+      attrs = %{attrs | "tags" => ["KPI", "customer order", "  what-the:heck?  "]}
+
+      assert {:ok, %{tags: tags}} = Projects.create_event(project, attrs)
+      assert ["kpi", "customer order", "what-the:heck?"] = tags
     end
   end
 
