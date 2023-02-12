@@ -1,5 +1,5 @@
 defmodule Hap.AccountsTest do
-  use Hap.DataCase
+  use Hap.DataCase, async: true
   alias Hap.Accounts
   import Hap.AccountsFixtures
   alias HapSchemas.Accounts.User
