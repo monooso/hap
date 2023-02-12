@@ -13,21 +13,11 @@ defmodule Hap.Projects do
   """
   @spec create_event(Project.t(), map()) :: {:ok, Event.t()} | {:error, Changeset.t()}
   def create_event(project, attrs) do
-    changeset = project |> Ecto.build_assoc(:events) |> Event.insert_changeset(attrs)
-
-    changeset =
-      case changeset.valid? do
-        true ->
-          changeset
-          |> normalize_event_metadata_changes()
-          |> normalize_event_name_changes()
-          |> normalize_event_tags_changes()
-
-        false ->
-          changeset
-      end
-
-    Repo.insert(changeset)
+    project
+    |> Ecto.build_assoc(:events)
+    |> Event.insert_changeset(attrs)
+    |> Hap.Projects.Events.normalize_event_changeset()
+    |> Repo.insert()
   end
 
   @doc """
@@ -64,37 +54,5 @@ defmodule Hap.Projects do
 
   def list_projects_by_organization(organization_id) do
     from(p in Project, where: p.organization_id == ^organization_id) |> Repo.all()
-  end
-
-  @spec normalize_event_metadata_changes(Changeset.t()) :: Changeset.t()
-  defp normalize_event_metadata_changes(changeset) do
-    metadata =
-      Changeset.get_change(changeset, :metadata, %{})
-      |> Map.new(fn {key, value} ->
-        {normalize_event_string(key), value}
-      end)
-
-    Changeset.put_change(changeset, :metadata, metadata)
-  end
-
-  @spec normalize_event_name_changes(Changeset.t()) :: Changeset.t()
-  defp normalize_event_name_changes(changeset) do
-    name = Changeset.get_change(changeset, :name, "") |> normalize_event_string()
-    Changeset.put_change(changeset, :name, name)
-  end
-
-  @spec normalize_event_string(String.t()) :: String.t()
-  defp normalize_event_string(string) do
-    string
-    |> String.trim()
-    |> String.downcase()
-    |> String.replace(~r/[\s]+/, " ")
-    |> String.replace(~r/["'`]/, "")
-  end
-
-  @spec normalize_event_tags_changes(Changeset.t()) :: Changeset.t()
-  defp normalize_event_tags_changes(changeset) do
-    tags = Changeset.get_change(changeset, :tags, []) |> Enum.map(&normalize_event_string/1)
-    Changeset.put_change(changeset, :tags, tags)
   end
 end
