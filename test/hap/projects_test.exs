@@ -33,16 +33,37 @@ defmodule Hap.ProjectsTest do
       assert {:error, %Changeset{}} = Projects.create_event(project, %{})
     end
 
-    test "it normalizes the event name", %{project: project, valid_attrs: attrs} do
-      attrs = %{attrs | "name" => "  Order~Received?  "}
+    test "it normalizes the metadata keys", %{project: project, valid_attrs: attrs} do
+      attrs = %{attrs | "metadata" => %{"  Customer-ID  " => 123, "'Order':  \"ID\"" => 456}}
 
-      assert {:ok, %{name: "order~received?"}} = Projects.create_event(project, attrs)
+      assert {:ok, %{metadata: %{"customer-id" => 123, "order: id" => 456}}} =
+               Projects.create_event(project, attrs)
+    end
+
+    test "it handles missing metadata", %{project: project, valid_attrs: attrs} do
+      attrs = Map.delete(attrs, "metadata")
+
+      assert {:ok, %{metadata: %{}}} = Projects.create_event(project, attrs)
+    end
+
+    test "it does not attempt to normalize invalid metadata", %{
+      project: project,
+      valid_attrs: attrs
+    } do
+      attrs = %{attrs | "metadata" => %{{"aw", "hell", "no"} => true}}
+      assert {:error, %Changeset{}} = Projects.create_event(project, attrs)
+    end
+
+    test "it normalizes the name", %{project: project, valid_attrs: attrs} do
+      attrs = %{attrs | "name" => "  'Order~  \"Received?  "}
+
+      assert {:ok, %{name: "order~ received?"}} = Projects.create_event(project, attrs)
     end
 
     test "it normalizes the tags", %{project: project, valid_attrs: attrs} do
-      attrs = %{attrs | "tags" => ["KPI", "customer order", "  what-the:heck?  "]}
+      attrs = %{attrs | "tags" => ["KPI", "customer order", "  \"what'`-the:    heck?  "]}
 
-      assert {:ok, %{tags: ["kpi", "customer order", "what-the:heck?"]}} =
+      assert {:ok, %{tags: ["kpi", "customer order", "what-the: heck?"]}} =
                Projects.create_event(project, attrs)
     end
 
