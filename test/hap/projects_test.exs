@@ -39,6 +39,17 @@ defmodule Hap.ProjectsTest do
       assert {:ok, %{tags: tags}} = Projects.create_event(project, attrs)
       assert ["kpi", "customer order", "what-the:heck?"] = tags
     end
+
+    test "it handles missing tags", %{project: project, valid_attrs: attrs} do
+      attrs = Map.delete(attrs, "tags")
+
+      assert {:ok, %{tags: []}} = Projects.create_event(project, attrs)
+    end
+
+    test "it does not attempt to normalize invalid tags", %{project: project, valid_attrs: attrs} do
+      attrs = %{attrs | "tags" => %{invalid: true}}
+      assert {:error, %Changeset{}} = Projects.create_event(project, attrs)
+    end
   end
 
   describe "create_project/1" do
