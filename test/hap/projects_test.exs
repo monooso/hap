@@ -33,11 +33,17 @@ defmodule Hap.ProjectsTest do
       assert {:error, %Changeset{}} = Projects.create_event(project, %{})
     end
 
+    test "it normalizes the event name", %{project: project, valid_attrs: attrs} do
+      attrs = %{attrs | "name" => "  Order~Received?  "}
+
+      assert {:ok, %{name: "order~received?"}} = Projects.create_event(project, attrs)
+    end
+
     test "it normalizes the tags", %{project: project, valid_attrs: attrs} do
       attrs = %{attrs | "tags" => ["KPI", "customer order", "  what-the:heck?  "]}
 
-      assert {:ok, %{tags: tags}} = Projects.create_event(project, attrs)
-      assert ["kpi", "customer order", "what-the:heck?"] = tags
+      assert {:ok, %{tags: ["kpi", "customer order", "what-the:heck?"]}} =
+               Projects.create_event(project, attrs)
     end
 
     test "it handles missing tags", %{project: project, valid_attrs: attrs} do

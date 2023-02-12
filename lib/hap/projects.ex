@@ -17,7 +17,7 @@ defmodule Hap.Projects do
 
     changeset =
       case changeset.valid? do
-        true -> changeset |> normalize_tags_changes()
+        true -> changeset |> normalize_event_name_changes() |> normalize_event_tags_changes()
         false -> changeset
       end
 
@@ -60,8 +60,18 @@ defmodule Hap.Projects do
     from(p in Project, where: p.organization_id == ^organization_id) |> Repo.all()
   end
 
-  @spec normalize_tags_changes(Changeset.t()) :: Changeset.t()
-  defp normalize_tags_changes(changeset) do
+  @spec normalize_event_name_changes(Changeset.t()) :: Changeset.t()
+  defp normalize_event_name_changes(changeset) do
+    name =
+      Changeset.get_change(changeset, :name, "")
+      |> String.trim()
+      |> String.downcase()
+
+    Changeset.put_change(changeset, :name, name)
+  end
+
+  @spec normalize_event_tags_changes(Changeset.t()) :: Changeset.t()
+  defp normalize_event_tags_changes(changeset) do
     tags =
       Changeset.get_change(changeset, :tags, [])
       |> Enum.map(&(&1 |> String.trim() |> String.downcase()))
