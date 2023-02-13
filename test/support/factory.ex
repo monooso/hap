@@ -3,6 +3,19 @@ defmodule Hap.Factory do
 
   use ExMachina.Ecto, repo: Hap.Repo
 
+  def event_factory do
+    %HapSchemas.Projects.Event{
+      message: "A new event has occurred",
+      metadata: %{
+        customer_id: 123,
+        order_id: 456
+      },
+      name: "Event" |> make_unique(),
+      project: build(:project),
+      tags: ["alpha", "bravo", "charlie"]
+    }
+  end
+
   def organization_factory do
     %HapSchemas.Accounts.Organization{
       name: "Organization" |> make_unique()

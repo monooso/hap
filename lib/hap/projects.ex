@@ -46,6 +46,16 @@ defmodule Hap.Projects do
     do: Repo.get_by(Project, api_key: api_key)
 
   @doc """
+  Returns a list of events belonging to the given project.
+  """
+  @spec list_events_by_project(Ecto.UUID.t() | Project.t()) :: list(Event.t())
+  def list_events_by_project(%Project{id: id}),
+    do: list_events_by_project(id)
+
+  def list_events_by_project(project_id),
+    do: from(e in Event, where: e.project_id == ^project_id) |> Repo.all()
+
+  @doc """
   Returns a list of projects belonging to the given organization.
   """
   @spec list_projects_by_organization(Ecto.UUID.t() | Organization.t()) :: list(Project.t())

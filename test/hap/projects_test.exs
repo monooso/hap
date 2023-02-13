@@ -70,6 +70,22 @@ defmodule Hap.ProjectsTest do
     end
   end
 
+  describe "list_events_by_project/1" do
+    test "it returns a list of event structs" do
+      project = insert(:project)
+      insert_pair(:event, project: project)
+
+      assert [%Event{}, %Event{}] = Projects.list_events_by_project(project.id)
+    end
+
+    test "it only includes events for the specified project" do
+      %{id: event_id, project_id: project_id} = insert(:event)
+      insert(:event)
+
+      assert [%Event{id: ^event_id}] = Projects.list_events_by_project(project_id)
+    end
+  end
+
   describe "list_projects_by_organization/1" do
     test "it returns a list of project structs" do
       organization = insert(:organization)
