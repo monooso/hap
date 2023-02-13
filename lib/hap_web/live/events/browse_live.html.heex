@@ -1,0 +1,7 @@
+<h1>Events</h1>
+
+<ol :if={@events !== []}>
+  <li :for={event <- @events}>
+    <%= event.name %>
+  </li>
+</ol>

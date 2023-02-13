@@ -88,12 +88,13 @@ defmodule HapWeb.Router do
     end
   end
 
-  scope "/projects", HapWeb.Projects do
+  scope "/projects", HapWeb do
     pipe_through [:browser]
 
     live_session :projects,
       on_mount: [{HapWeb.UserAuth, :ensure_authenticated}] do
-      live "/", BrowseLive, :browse
+      live "/", Projects.BrowseLive, :browse
+      live "/:project_id/events", Events.BrowseLive, :browse
     end
   end
 end
