@@ -39,6 +39,15 @@ defmodule Hap.Projects do
     do: Project.insert_changeset(%Project{}, attrs)
 
   @doc """
+  Returns the project identified by the given id.
+
+  Raises an `Ecto.NoResultsError` if the project does not exist.
+  """
+  @spec get_project!(Integer.t()) :: Project.t()
+  def get_project!(id),
+    do: Repo.get!(Project, id)
+
+  @doc """
   Returns the project associated with the given API key.
   """
   @spec get_project_by_api_key(Ecto.UUID.t()) :: Project.t()
@@ -48,7 +57,6 @@ defmodule Hap.Projects do
   @doc """
   Returns a list of events belonging to the given project.
   """
-  @spec list_events_by_project(Ecto.UUID.t() | Project.t()) :: list(Event.t())
   @spec list_events_by_project(Integer.t() | Project.t()) :: list(Event.t())
   def list_events_by_project(%Project{id: id}),
     do: list_events_by_project(id)
@@ -59,7 +67,6 @@ defmodule Hap.Projects do
   @doc """
   Returns a list of projects belonging to the given organization.
   """
-  @spec list_projects_by_organization(Ecto.UUID.t() | Organization.t()) :: list(Project.t())
   @spec list_projects_by_organization(Integer.t() | Organization.t()) :: list(Project.t())
   def list_projects_by_organization(%Organization{id: id}),
     do: list_projects_by_organization(id)

@@ -59,6 +59,19 @@ defmodule Hap.ProjectsTest do
     end
   end
 
+  describe "get_project!/1" do
+    test "it returns the project identified by the given id" do
+      %{id: project_id} = insert(:project)
+      assert %Project{id: ^project_id} = Projects.get_project!(project_id)
+    end
+
+    test "it raises an Ecto.NoResultsError if the project does not exist" do
+      assert_raise Ecto.NoResultsError, fn ->
+        Projects.get_project!(123)
+      end
+    end
+  end
+
   describe "get_project_by_api_key/1" do
     test "it returns the project associated with the given API key" do
       %{id: project_id, api_key: api_key} = insert(:project)
