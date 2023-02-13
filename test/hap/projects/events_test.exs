@@ -49,5 +49,14 @@ defmodule Hap.Projects.EventsTest do
                |> Events.normalize_event_changeset()
                |> Changeset.get_change(:tags)
     end
+
+    test "deduplicates the tags list after normalization", %{valid_attrs: attrs} do
+      attrs = %{attrs | "tags" => ["KPI", "KPI", "kpi", "kpi"]}
+
+      assert ["kpi"] =
+               Event.insert_changeset(%Event{}, attrs)
+               |> Events.normalize_event_changeset()
+               |> Changeset.get_change(:tags)
+    end
   end
 end
