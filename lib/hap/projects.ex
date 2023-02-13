@@ -49,6 +49,7 @@ defmodule Hap.Projects do
   Returns a list of events belonging to the given project.
   """
   @spec list_events_by_project(Ecto.UUID.t() | Project.t()) :: list(Event.t())
+  @spec list_events_by_project(Integer.t() | Project.t()) :: list(Event.t())
   def list_events_by_project(%Project{id: id}),
     do: list_events_by_project(id)
 
@@ -59,6 +60,7 @@ defmodule Hap.Projects do
   Returns a list of projects belonging to the given organization.
   """
   @spec list_projects_by_organization(Ecto.UUID.t() | Organization.t()) :: list(Project.t())
+  @spec list_projects_by_organization(Integer.t() | Organization.t()) :: list(Project.t())
   def list_projects_by_organization(%Organization{id: id}),
     do: list_projects_by_organization(id)
 
