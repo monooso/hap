@@ -7,8 +7,8 @@ defmodule Hap.Factory do
     %HapSchemas.Projects.Event{
       message: "A new event has occurred",
       metadata: %{
-        customer_id: 123,
-        order_id: 456
+        customer_id: Enum.random(1..1_000_000),
+        order_id: Enum.random(1..1_000_000)
       },
       name: "Event" |> make_unique(),
       project: build(:project),
