@@ -94,7 +94,7 @@ defmodule HapWeb.Router do
     live_session :projects,
       on_mount: [{HapWeb.UserAuth, :ensure_authenticated}] do
       live "/", Projects.BrowseLive, :browse
-      live "/:project_id/events", Events.BrowseLive, :browse
+      live "/:project_slug/events", Events.BrowseLive, :browse
     end
   end
 end

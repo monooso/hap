@@ -4,7 +4,7 @@
   <:col :let={project} label="Name"><%= project.name %></:col>
   <:col :let={project} label="API Key"><%= project.api_key %></:col>
   <:col :let={project} label="Events">
-    <.link navigate={~p"/projects/#{project.id}/events"}>View events</.link>
+    <.link navigate={~p"/projects/#{project}/events"}>View events</.link>
   </:col>
 </.table>
 

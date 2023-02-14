@@ -83,6 +83,19 @@ defmodule Hap.ProjectsTest do
     end
   end
 
+  describe "get_project_by_slug!/1" do
+    test "it returns the project identified by the given id" do
+      %{id: project_id, slug: slug} = insert(:project)
+      assert %Project{id: ^project_id} = Projects.get_project_by_slug!(slug)
+    end
+
+    test "it raises an Ecto.NoResultsError if the project does not exist" do
+      assert_raise Ecto.NoResultsError, fn ->
+        Projects.get_project_by_slug!("nope")
+      end
+    end
+  end
+
   describe "list_events_by_project/1" do
     test "it returns a list of event structs" do
       project = insert(:project)

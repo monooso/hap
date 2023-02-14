@@ -9,16 +9,16 @@ defmodule HapWeb.Hooks.ProjectTest do
 
   describe "fetch_current_project/3" do
     test "it adds the current project to the socket" do
-      %{id: project_id} = insert(:project)
-      params = %{"project_id" => project_id}
+      %{id: id, slug: slug} = insert(:project)
+      params = %{"project_slug" => slug}
 
-      assert {:cont, %Socket{assigns: %{current_project: %Project{id: ^project_id}}}} =
+      assert {:cont, %Socket{assigns: %{current_project: %Project{id: ^id}}}} =
                Hooks.on_mount(:fetch_current_project, params, nil, %Socket{})
     end
 
     test "it raises an Ecto.NoResultsError if the project does not exist" do
       assert_raise(Ecto.NoResultsError, fn ->
-        Hooks.on_mount(:fetch_current_project, %{"project_id" => 123}, nil, %Socket{})
+        Hooks.on_mount(:fetch_current_project, %{"project_slug" => "nope"}, nil, %Socket{})
       end)
     end
 

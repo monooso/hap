@@ -56,6 +56,15 @@ defmodule Hap.Projects do
     do: Repo.get_by(Project, api_key: api_key)
 
   @doc """
+  Returns the project identified by the given slug.
+
+  Raises an `Ecto.NoResultsError` if the project does not exist.
+  """
+  @spec get_project_by_slug!(String.t()) :: Project.t()
+  def get_project_by_slug!(slug),
+    do: Repo.get_by!(Project, slug: slug)
+
+  @doc """
   Returns a list of events belonging to the given project.
   """
   @spec list_events_by_project(Integer.t() | Project.t()) :: list(Event.t())

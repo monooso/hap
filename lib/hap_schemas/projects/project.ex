@@ -9,6 +9,7 @@ defmodule HapSchemas.Projects.Project do
 
   @type t() :: %__MODULE__{}
 
+  @derive {Phoenix.Param, key: :slug}
   schema "projects" do
     field :api_key, :string
     field :name, :string
