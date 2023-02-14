@@ -7,11 +7,13 @@ defmodule Hap.Repo.Migrations.CreateProjectsTable do
     create table(@table_name) do
       add :organization_id, references(:organizations, on_delete: :delete_all), null: false
       add :name, :string, null: false
+      add :slug, :string, null: false
       add :api_key, :string, null: false
       timestamps()
     end
 
     create index(@table_name, [:organization_id])
     create unique_index(@table_name, [:api_key])
+    create unique_index(@table_name, [:slug])
   end
 end

@@ -13,7 +13,8 @@ defmodule HapSchemas.Projects.ProjectTest do
         valid_attrs: %{
           api_key: Ecto.UUID.generate(),
           name: "My Project",
-          organization_id: organization.id
+          organization_id: organization.id,
+          slug: Hap.Helpers.Slugger.generate_random_slug()
         }
       ]
     end
@@ -77,6 +78,29 @@ defmodule HapSchemas.Projects.ProjectTest do
       {:error, changeset} = %Project{} |> Project.insert_changeset(attrs) |> Repo.insert()
 
       assert %{organization: ["does not exist"]} = errors_on(changeset)
+    end
+
+    test "the slug attribute is required", %{valid_attrs: attrs} do
+      attrs = Map.delete(attrs, :slug)
+      changeset = Project.insert_changeset(%Project{}, attrs)
+
+      assert %{slug: ["can't be blank"]} = errors_on(changeset)
+    end
+
+    test "the slug cannot be longer than 255 characters", %{valid_attrs: attrs} do
+      attrs = %{attrs | slug: String.duplicate("a", 256)}
+
+      changeset = Project.insert_changeset(%Project{}, attrs)
+
+      assert %{slug: ["should be at most 255 character(s)"]} = errors_on(changeset)
+    end
+
+    test "the slug must be unique", %{valid_attrs: attrs} do
+      insert(:project, slug: attrs.slug)
+
+      {:error, changeset} = %Project{} |> Project.insert_changeset(attrs) |> Repo.insert()
+
+      assert %{slug: ["has already been taken"]} = errors_on(changeset)
     end
   end
 end

@@ -26,7 +26,8 @@ defmodule Hap.Factory do
     %HapSchemas.Projects.Project{
       api_key: Ecto.UUID.generate(),
       name: "Project" |> make_unique(),
-      organization: build(:organization)
+      organization: build(:organization),
+      slug: Hap.Helpers.Slugger.generate_random_slug()
     }
   end
 

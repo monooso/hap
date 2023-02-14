@@ -27,6 +27,7 @@ defmodule Hap.Projects do
   def create_project(attrs) do
     attrs
     |> Map.put("api_key", Ecto.UUID.generate())
+    |> Map.put("slug", Hap.Helpers.Slugger.generate_random_slug())
     |> create_project_changeset()
     |> Repo.insert()
   end
