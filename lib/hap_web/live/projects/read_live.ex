@@ -1,4 +1,4 @@
-defmodule HapWeb.Events.BrowseLive do
+defmodule HapWeb.Projects.ReadLive do
   @moduledoc false
 
   use HapWeb, :live_view
