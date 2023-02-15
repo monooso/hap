@@ -1,5 +1,15 @@
 <h1><%= @current_project.name %></h1>
 
+<div>
+  <.simple_form :let={f} for={@changeset} id="event_query_form" phx-submit="filter_events">
+    <.input field={{f, :name}} type="text" label="Name" />
+
+    <:actions>
+      <.button phx-disable-with="Searching events...">Search</.button>
+    </:actions>
+  </.simple_form>
+</div>
+
 <ol :if={@events !== []}>
   <li :for={event <- @events}>
     <%= event.name %>

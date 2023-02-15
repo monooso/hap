@@ -39,7 +39,7 @@ defmodule Hap.Projects.Events do
   defp apply_event_query_filters(query, %EventQuery{name: nil}), do: query
 
   defp apply_event_query_filters(query, %EventQuery{name: name}),
-    do: from(e in query, where: e.name == ^name)
+    do: from(e in query, where: ilike(e.name, ^"%#{name}%"))
 
   @spec deduplicate_tags(Changeset.t()) :: Changeset.t()
   defp deduplicate_tags(changeset) do

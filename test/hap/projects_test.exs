@@ -97,24 +97,6 @@ defmodule Hap.ProjectsTest do
     end
   end
 
-  describe "list_distinct_event_names_by_project/1" do
-    test "it returns a list of event names associated with the given project" do
-      project = insert(:project)
-      insert(:event, project: project, name: "Order Received")
-      insert(:event, project: project, name: "Order Returned")
-
-      assert ["Order Received", "Order Returned"] =
-               Projects.list_distinct_event_names_by_project(project)
-    end
-
-    test "it removes duplicate event names" do
-      project = insert(:project)
-      insert_list(3, :event, project: project, name: "Dedupe me")
-
-      assert ["Dedupe me"] = Projects.list_distinct_event_names_by_project(project)
-    end
-  end
-
   describe "list_events_by_project/2" do
     test "it returns a list of event structs" do
       project = insert(:project)

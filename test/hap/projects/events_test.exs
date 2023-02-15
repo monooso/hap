@@ -1,8 +1,40 @@
 defmodule Hap.Projects.EventsTest do
-  use ExUnit.Case, async: true
+  import Hap.Factory
+  use Hap.DataCase, async: true
   alias Ecto.Changeset
+  alias Ecto.Query
   alias Hap.Projects.Events
   alias HapSchemas.Projects.Event
+  alias HapSchemas.Ui.EventQuery
+
+  describe "list_events_by_project_query/2" do
+    setup do
+      [project: insert(:project)]
+    end
+
+    test "it returns an Ecto.Query struct", %{project: project} do
+      assert %Query{} = Events.list_events_by_project_query(project, %EventQuery{})
+    end
+
+    test "it limits results to events belonging to the given project", %{project: project} do
+      insert(:event)
+
+      %{id: event_id} = insert(:event, project: project)
+
+      assert [%Event{id: ^event_id}] =
+               Events.list_events_by_project_query(project, %EventQuery{}) |> Repo.all()
+    end
+
+    test "it limits results to events with a similar name", %{project: project} do
+      insert(:event, project: project, name: "Billy Ray")
+
+      %{id: event_id} = insert(:event, project: project, name: "Jim Bob")
+
+      assert [%Event{id: ^event_id}] =
+               Events.list_events_by_project_query(project, %EventQuery{name: "jim bo"})
+               |> Repo.all()
+    end
+  end
 
   describe "normalize_event_changeset/1" do
     setup do
