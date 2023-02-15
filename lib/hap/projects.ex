@@ -65,6 +65,23 @@ defmodule Hap.Projects do
     do: Repo.get_by!(Project, slug: slug)
 
   @doc """
+  Returns a deduplicated list of event names belonging to the given project.
+  """
+  @spec list_distinct_event_names_by_project(Integer.t() | Project.t()) :: list(String.t())
+  def list_distinct_event_names_by_project(%Project{id: id}),
+    do: list_distinct_event_names_by_project(id)
+
+  def list_distinct_event_names_by_project(project_id) do
+    from(e in Event,
+      where: e.project_id == ^project_id,
+      distinct: true,
+      select: e.name,
+      order_by: [e.name]
+    )
+    |> Repo.all()
+  end
+
+  @doc """
   Returns a list of events belonging to the given project.
   """
   @spec list_events_by_project(Integer.t() | Project.t()) :: list(Event.t())
