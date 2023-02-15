@@ -1,7 +1,23 @@
 defmodule Hap.Projects.Events do
   @moduledoc false
 
+  import Ecto.Query, only: [from: 2]
   alias Ecto.Changeset
+  alias Ecto.Query
+  alias HapSchemas.Projects.Event
+  alias HapSchemas.Projects.Project
+  alias HapSchemas.Ui.EventQuery
+
+  @doc """
+  Returns an Ecto.Query for retrieving the events belonging to the given project. Applies the
+  conditions defined in the given EventQuery.
+  """
+  @spec list_events_by_project_query(Integer.t() | Project.t(), EventQuery.t()) :: Query.t()
+  def list_events_by_project_query(%Project{id: id}, filters),
+    do: list_events_by_project_query(id, filters)
+
+  def list_events_by_project_query(project_id, filters),
+    do: from(e in Event, where: e.project_id == ^project_id) |> apply_event_query_filters(filters)
 
   @doc """
   Normalizes the given changeset, if it contains valid changes.
@@ -18,6 +34,12 @@ defmodule Hap.Projects.Events do
   end
 
   def normalize_event_changeset(changeset), do: changeset
+
+  @spec apply_event_query_filters(Query.t(), EventQuery.t()) :: Query.t()
+  defp apply_event_query_filters(query, %EventQuery{name: nil}), do: query
+
+  defp apply_event_query_filters(query, %EventQuery{name: name}),
+    do: from(e in query, where: e.name == ^name)
 
   @spec deduplicate_tags(Changeset.t()) :: Changeset.t()
   defp deduplicate_tags(changeset) do

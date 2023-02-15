@@ -3,10 +3,12 @@ defmodule Hap.Projects do
 
   import Ecto.Query, only: [from: 2]
   alias Ecto.Changeset
+  alias Hap.Projects
   alias Hap.Repo
   alias HapSchemas.Accounts.Organization
   alias HapSchemas.Projects.Event
   alias HapSchemas.Projects.Project
+  alias HapSchemas.Ui.EventQuery
 
   @doc """
   Creates an event for the given project with the given attributes.
@@ -16,7 +18,7 @@ defmodule Hap.Projects do
     project
     |> Ecto.build_assoc(:events)
     |> Event.insert_changeset(attrs)
-    |> Hap.Projects.Events.normalize_event_changeset()
+    |> Projects.Events.normalize_event_changeset()
     |> Repo.insert()
   end
 
@@ -38,6 +40,13 @@ defmodule Hap.Projects do
   @spec create_project_changeset(map()) :: Changeset.t()
   def create_project_changeset(attrs),
     do: Project.insert_changeset(%Project{}, attrs)
+
+  @doc """
+  Returns a changeset for filtering events.
+  """
+  @spec event_query_changeset(EventQuery.t() | Changeset.t(), map()) :: Changeset.t()
+  def event_query_changeset(struct_or_changeset, attrs),
+    do: EventQuery.changeset(struct_or_changeset, attrs)
 
   @doc """
   Returns the project identified by the given id.
@@ -82,14 +91,14 @@ defmodule Hap.Projects do
   end
 
   @doc """
-  Returns a list of events belonging to the given project.
+  Returns a list of events belonging to the given project. Limits results to those matching the
+  given filters.
   """
-  @spec list_events_by_project(Integer.t() | Project.t()) :: list(Event.t())
-  def list_events_by_project(%Project{id: id}),
-    do: list_events_by_project(id)
+  @spec list_events_by_project(Integer.t() | Project.t(), EventQuery.t()) :: list(Event.t())
+  def list_events_by_project(project, filters \\ %EventQuery{})
 
-  def list_events_by_project(project_id),
-    do: from(e in Event, where: e.project_id == ^project_id) |> Repo.all()
+  def list_events_by_project(project, filters),
+    do: Projects.Events.list_events_by_project_query(project, filters) |> Repo.all()
 
   @doc """
   Returns a list of projects belonging to the given organization.

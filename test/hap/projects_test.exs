@@ -5,6 +5,7 @@ defmodule Hap.ProjectsTest do
   alias Hap.Projects
   alias HapSchemas.Projects.Event
   alias HapSchemas.Projects.Project
+  alias HapSchemas.Ui.EventQuery
 
   describe "create_event/2" do
     setup do
@@ -114,7 +115,7 @@ defmodule Hap.ProjectsTest do
     end
   end
 
-  describe "list_events_by_project/1" do
+  describe "list_events_by_project/2" do
     test "it returns a list of event structs" do
       project = insert(:project)
       insert_pair(:event, project: project)
@@ -127,6 +128,16 @@ defmodule Hap.ProjectsTest do
       insert(:event)
 
       assert [%Event{id: ^event_id}] = Projects.list_events_by_project(project_id)
+    end
+
+    test "it limits events to those with the given name" do
+      project = insert(:project)
+      insert(:event, name: "Order Returned", project: project)
+
+      %{id: event_id} = insert(:event, name: "Order Received", project: project)
+
+      assert [%Event{id: ^event_id}] =
+               Projects.list_events_by_project(project.id, %EventQuery{name: "Order Received"})
     end
   end
 
