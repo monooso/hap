@@ -53,6 +53,17 @@ defmodule Hap.Projects.EventsTest do
                |> Repo.all()
     end
 
+    test "it limits results to events with the given tags", %{project: project} do
+      insert(:event, project: project, tags: ["alpha", "bravo", "charlie"])
+
+      %{id: event_id} =
+        insert(:event, project: project, tags: ["alpha", "bravo", "charlie", "delta"])
+
+      assert [%Event{id: ^event_id}] =
+               Events.list_events_by_project_query(project, %EventQuery{tags: ["bravo", "delta"]})
+               |> Repo.all()
+    end
+
     test "it limits results by multiple query conditions", %{project: project} do
       insert(:event, project: project, name: "Order placed", message: "Mad dollar bills, yo")
       insert(:event, project: project, name: "Donation received", message: "Mad dollar bills, yo")

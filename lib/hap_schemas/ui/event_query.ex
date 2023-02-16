@@ -10,11 +10,12 @@ defmodule HapSchemas.Ui.EventQuery do
   embedded_schema do
     field :message, :string
     field :name, :string
+    field :tags, {:array, :string}
   end
 
   @spec changeset(Changeset.t() | t(), map()) :: Changeset.t()
   def changeset(struct_or_changeset, attrs) do
     struct_or_changeset
-    |> cast(attrs, [:message, :name])
+    |> cast(attrs, [:message, :name, :tags])
   end
 end
