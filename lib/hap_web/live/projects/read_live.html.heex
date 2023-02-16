@@ -3,6 +3,7 @@
 <div>
   <.simple_form :let={f} for={@changeset} id="event_query_form" phx-submit="filter_events">
     <.input field={{f, :name}} type="text" label="Name" />
+    <.input field={{f, :message}} type="text" label="Message" />
 
     <:actions>
       <.button phx-disable-with="Searching events...">Search</.button>
@@ -12,6 +13,6 @@
 
 <ol :if={@events !== []}>
   <li :for={event <- @events}>
-    <%= event.name %>
+    <%= event.name %> &middot; <%= event.message %>
   </li>
 </ol>
