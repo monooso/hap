@@ -36,10 +36,22 @@ defmodule Hap.Projects.Events do
   def normalize_event_changeset(changeset), do: changeset
 
   @spec apply_event_query_filters(Query.t(), EventQuery.t()) :: Query.t()
-  defp apply_event_query_filters(query, %EventQuery{name: nil}), do: query
+  defp apply_event_query_filters(query, filters) do
+    filters
+    |> Map.from_struct()
+    |> Enum.reduce(query, fn {key, value}, query ->
+      apply_event_query_filter(query, key, value)
+    end)
+  end
 
-  defp apply_event_query_filters(query, %EventQuery{name: name}),
+  @spec apply_event_query_filter(Query.t(), atom, any) :: Query.t()
+  defp apply_event_query_filter(query, :message, message) when not is_nil(message),
+    do: from(e in query, where: ilike(e.message, ^"%#{message}%"))
+
+  defp apply_event_query_filter(query, :name, name) when not is_nil(name),
     do: from(e in query, where: ilike(e.name, ^"%#{name}%"))
+
+  defp apply_event_query_filter(query, _key, _value), do: query
 
   @spec deduplicate_tags(Changeset.t()) :: Changeset.t()
   defp deduplicate_tags(changeset) do

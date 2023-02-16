@@ -8,12 +8,13 @@ defmodule HapSchemas.Ui.EventQuery do
   @type t() :: %__MODULE__{}
 
   embedded_schema do
+    field :message, :string
     field :name, :string
   end
 
   @spec changeset(Changeset.t() | t(), map()) :: Changeset.t()
   def changeset(struct_or_changeset, attrs) do
     struct_or_changeset
-    |> cast(attrs, [:name])
+    |> cast(attrs, [:message, :name])
   end
 end
