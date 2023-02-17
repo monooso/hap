@@ -6,6 +6,7 @@ defmodule HapWeb.Projects.ReadLive do
   alias HapSchemas.Ui.EventQuery
 
   on_mount {HapWeb.Hooks.Project, :fetch_current_project}
+  on_mount {HapWeb.Hooks.Project, :require_project_access}
 
   @impl true
   def mount(_params, _session, socket) do

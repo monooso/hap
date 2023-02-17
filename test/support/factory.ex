@@ -31,6 +31,14 @@ defmodule Hap.Factory do
     }
   end
 
+  def user_factory do
+    %HapSchemas.Accounts.User{
+      email: ("user" |> make_unique()) <> "@example.com",
+      hashed_password: Bcrypt.hash_pwd_salt("password"),
+      organization: build(:organization)
+    }
+  end
+
   @spec make_unique(String.t()) :: String.t()
   defp make_unique(string) when is_binary(string) do
     "#{string}#{System.unique_integer([:positive, :monotonic])}"
