@@ -1,7 +1,5 @@
 # Hap
-Hap is a real-time monitoring tool for your most important business metrics. Or least important, it's really up to you.
-
-If you'd to follow along with Hap's development, I'm building it [live on Twitch](https://twitch.tv/stephencodes).
+Hap is a real-time monitoring tool for your most important business metrics. Or least important, it's really up to you. I'm building it [live on Twitch](https://twitch.tv/stephencodes).
 
 ## Building and running
 Hap requires Elixir and PostgreSQL. Install them however you wish.
