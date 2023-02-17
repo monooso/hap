@@ -51,8 +51,10 @@ defmodule Hap.Projects.Events do
   defp apply_event_query_filter(query, :name, name) when not is_nil(name),
     do: from(e in query, where: ilike(e.name, ^"%#{name}%"))
 
-  defp apply_event_query_filter(query, :tags, tags) when is_list(tags) do
-    Enum.reduce(tags, query, fn tag, query ->
+  defp apply_event_query_filter(query, :tags, tags) when not is_nil(tags) do
+    String.split(tags, ",")
+    |> Enum.map(&normalize_string/1)
+    |> Enum.reduce(query, fn tag, query ->
       from(e in query, where: ^tag in e.tags)
     end)
   end

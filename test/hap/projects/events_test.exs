@@ -60,7 +60,7 @@ defmodule Hap.Projects.EventsTest do
         insert(:event, project: project, tags: ["alpha", "bravo", "charlie", "delta"])
 
       assert [%Event{id: ^event_id}] =
-               Events.list_events_by_project_query(project, %EventQuery{tags: ["bravo", "delta"]})
+               Events.list_events_by_project_query(project, %EventQuery{tags: "bravo, delta"})
                |> Repo.all()
     end
 

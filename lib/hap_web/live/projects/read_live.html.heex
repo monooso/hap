@@ -4,6 +4,7 @@
   <.simple_form :let={f} for={@changeset} id="event_query_form" phx-submit="filter_events">
     <.input field={{f, :name}} type="text" label="Name" />
     <.input field={{f, :message}} type="text" label="Message" />
+    <.input field={{f, :tags}} type="text" label="Tags" />
 
     <:actions>
       <.button phx-disable-with="Searching events...">Search</.button>
@@ -13,6 +14,11 @@
 
 <ol :if={@events !== []}>
   <li :for={event <- @events}>
-    <%= event.name %> &middot; <%= event.message %>
+    <h3><%= event.name %></h3>
+    <p><%= event.message %></p>
+    <ul :if={event.tags !== []}>
+      <li :for={tag <- event.tags}><%= tag %></li>
+    </ul>
+    <hr />
   </li>
 </ol>

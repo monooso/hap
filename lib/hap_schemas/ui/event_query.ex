@@ -10,7 +10,7 @@ defmodule HapSchemas.Ui.EventQuery do
   embedded_schema do
     field :message, :string
     field :name, :string
-    field :tags, {:array, :string}
+    field :tags, :string
   end
 
   @spec changeset(Changeset.t() | t(), map()) :: Changeset.t()
