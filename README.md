@@ -1,19 +1,15 @@
 # Hap
+Hap is a real-time monitoring tool for your most important business metrics. Or least important, it's really up to you.
 
-To start your Phoenix server:
+If you'd to follow along with Hap's development, I'm building it [live on Twitch](https://twitch.tv/stephencodes).
 
-  * Install dependencies with `mix deps.get`
-  * Create and migrate your database with `mix ecto.setup`
-  * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+## Building and running
+Hap requires Elixir and PostgreSQL. Install them however you wish.
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+To get started:
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
-
-## Learn more
-
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+1. Clone the repository.
+2. Run `mix deps.get` to install the dependencies.
+3. Run `mix ecto.setup` to create and migrate the database.
+4. Start the development server with `mix phx.server` or `iex -S mix phx.server`.
+5. Visit [`localhost:4000`](http://localhost:4000), and behold the glory.
