@@ -5,8 +5,8 @@ defmodule HapWeb.UserForgotPasswordLive do
 
   def render(assigns) do
     ~H"""
-    <div class="mx-auto max-w-sm">
-      <.header class="text-center">
+    <div>
+      <.header>
         Forgot your password?
         <:subtitle>We'll send a password reset link to your inbox</:subtitle>
       </.header>
@@ -14,12 +14,12 @@ defmodule HapWeb.UserForgotPasswordLive do
       <.simple_form :let={f} id="reset_password_form" for={:user} phx-submit="send_email">
         <.input field={{f, :email}} type="email" placeholder="Email" required />
         <:actions>
-          <.button phx-disable-with="Sending..." class="w-full">
+          <.button phx-disable-with="Sending...">
             Send password reset instructions
           </.button>
         </:actions>
       </.simple_form>
-      <p class="text-center mt-4">
+      <p>
         <.link href={~p"/users/register"}>Register</.link>
         |
         <.link href={~p"/users/log_in"}>Log in</.link>

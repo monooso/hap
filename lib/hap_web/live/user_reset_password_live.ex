@@ -5,8 +5,8 @@ defmodule HapWeb.UserResetPasswordLive do
 
   def render(assigns) do
     ~H"""
-    <div class="mx-auto max-w-sm">
-      <.header class="text-center">Reset Password</.header>
+    <div>
+      <.header>Reset Password</.header>
 
       <.simple_form
         :let={f}
@@ -27,11 +27,11 @@ defmodule HapWeb.UserResetPasswordLive do
           required
         />
         <:actions>
-          <.button phx-disable-with="Resetting..." class="w-full">Reset Password</.button>
+          <.button phx-disable-with="Resetting...">Reset Password</.button>
         </:actions>
       </.simple_form>
 
-      <p class="text-center mt-4">
+      <p>
         <.link href={~p"/users/register"}>Register</.link>
         |
         <.link href={~p"/users/log_in"}>Log in</.link>

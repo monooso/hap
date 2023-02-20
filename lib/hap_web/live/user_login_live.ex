@@ -3,12 +3,12 @@ defmodule HapWeb.UserLoginLive do
 
   def render(assigns) do
     ~H"""
-    <div class="mx-auto max-w-sm">
-      <.header class="text-center">
+    <div>
+      <.header>
         Sign in to account
         <:subtitle>
           Don't have an account?
-          <.link navigate={~p"/users/register"} class="font-semibold text-brand hover:underline">
+          <.link navigate={~p"/users/register"}>
             Sign up
           </.link>
           for an account now.
@@ -28,12 +28,12 @@ defmodule HapWeb.UserLoginLive do
 
         <:actions :let={f}>
           <.input field={{f, :remember_me}} type="checkbox" label="Keep me logged in" />
-          <.link href={~p"/users/reset_password"} class="text-sm font-semibold">
+          <.link href={~p"/users/reset_password"}>
             Forgot your password?
           </.link>
         </:actions>
         <:actions>
-          <.button phx-disable-with="Signing in..." class="w-full">
+          <.button phx-disable-with="Signing in...">
             Sign in <span aria-hidden="true">→</span>
           </.button>
         </:actions>
