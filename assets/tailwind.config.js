@@ -1,6 +1,7 @@
 // See the Tailwind configuration guide for advanced usage
 // https://tailwindcss.com/docs/configuration
 
+const defaultTheme = require("tailwindcss/defaultTheme")
 const plugin = require("tailwindcss/plugin")
 
 module.exports = {
@@ -9,6 +10,9 @@ module.exports = {
     "../lib/*_web.ex",
     "../lib/*_web/**/*.*ex"
   ],
+  theme: {
+    extend: { fontFamily: { "sans": ["'Source Sans 3'", ...defaultTheme.fontFamily.sans] } }
+  },
   plugins: [
     require("@tailwindcss/forms"),
     plugin(({ addVariant }) => addVariant("phx-no-feedback", [".phx-no-feedback&", ".phx-no-feedback &"])),
