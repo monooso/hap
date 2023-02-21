@@ -11,8 +11,12 @@ defmodule HapWeb.CoreComponents do
   """
   use Phoenix.Component
 
-  alias Phoenix.LiveView.JS
+  use Phoenix.VerifiedRoutes,
+    endpoint: HapWeb.Endpoint,
+    router: HapWeb.Router
+
   import HapWeb.Gettext
+  alias Phoenix.LiveView.JS
 
   @doc """
   Renders a modal.
@@ -541,6 +545,102 @@ defmodule HapWeb.CoreComponents do
     |> JS.hide(to: "##{id}", transition: {"block", "block", "hidden"})
     |> JS.remove_class("overflow-hidden", to: "body")
     |> JS.pop_focus()
+  end
+
+  @doc """
+  Renders the user settings dropdown navigation on desktop.
+  """
+  def user_settings_nav(assigns) do
+    assigns = Map.put(assigns, :id, "user-menu")
+
+    ~H"""
+    <div class="relative">
+      <div>
+        <button
+          type="button"
+          class="flex max-w-xs items-center rounded-full bg-gray-800 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+          id={"#{@id}-button"}
+          aria-expanded="false"
+          aria-haspopup="true"
+          phx-click={toggle_user_settings_nav(@id)}
+          phx-click-away={hide_user_settings_nav(@id)}
+          phx-window-keydown={hide_user_settings_nav(@id)}
+          phx-key="escape"
+        >
+          <span class="sr-only">Open user menu</span>
+          <img
+            class="h-8 w-8 rounded-full"
+            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+            alt=""
+          />
+        </button>
+      </div>
+
+      <div
+        class="absolute hidden right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+        id={@id}
+        role="menu"
+        aria-orientation="vertical"
+        aria-labelledby={"#{@id}-button"}
+        tabindex="-1"
+      >
+        <!-- Active: "bg-gray-100", Not Active: "" -->
+        <a
+          href="#"
+          class="block px-4 py-2 text-sm text-gray-700"
+          role="menuitem"
+          tabindex="-1"
+          id={"#{@id}-item-0"}
+        >
+          Your Profile
+        </a>
+
+        <.link
+          href={~p"/users/settings"}
+          class="block px-4 py-2 text-sm text-gray-700"
+          role="menuitem"
+          tabindex="-1"
+          id={"#{@id}-item-1"}
+        >
+          Settings
+        </.link>
+
+        <.link
+          href={~p"/users/log_out"}
+          method="delete"
+          class="block px-4 py-2 text-sm text-gray-700"
+          role="menuitem"
+          tabindex="-1"
+          id={"#{@id}-item-2"}
+        >
+          Sign out
+        </.link>
+      </div>
+    </div>
+    """
+  end
+
+  @doc """
+  Hide the user settings navigation on desktop.
+  """
+  def hide_user_settings_nav(js \\ %JS{}, id) do
+    js
+    |> JS.hide(
+      to: "##{id}",
+      transition: {"ease-in duration-75", "opacity-100 scale-100", "opacity-0 scale-95"}
+    )
+  end
+
+  @doc """
+  Toggle the user settings navigation on desktop.
+  """
+  def toggle_user_settings_nav(js \\ %JS{}, id) do
+    js
+    |> JS.toggle(
+      to: "##{id}",
+      in: {"ease-out duration-100", "opacity-0 scale-95", "opacity-100 scale-100"},
+      out: {"ease-in duration-75", "opacity-100 scale-100", "opacity-0 scale-95"}
+    )
   end
 
   @doc """

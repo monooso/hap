@@ -1,5 +1,5 @@
 defmodule HapWeb.UserConfirmationInstructionsLive do
-  use HapWeb, :live_view
+  use HapWeb, :guest_live_view
 
   alias Hap.Accounts
 

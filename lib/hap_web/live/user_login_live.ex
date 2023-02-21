@@ -1,5 +1,5 @@
 defmodule HapWeb.UserLoginLive do
-  use HapWeb, :live_view
+  use HapWeb, :guest_live_view
 
   def render(assigns) do
     ~H"""
