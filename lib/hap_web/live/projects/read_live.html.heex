@@ -1,24 +1,25 @@
-<h1><%= @current_project.name %></h1>
+<.app_header title={@page_title} />
+<.app_main>
+  <div>
+    <.simple_form :let={f} for={@changeset} id="event_query_form" phx-submit="filter_events">
+      <.input field={{f, :name}} type="text" label="Name" />
+      <.input field={{f, :message}} type="text" label="Message" />
+      <.input field={{f, :tags}} type="text" label="Tags" />
 
-<div>
-  <.simple_form :let={f} for={@changeset} id="event_query_form" phx-submit="filter_events">
-    <.input field={{f, :name}} type="text" label="Name" />
-    <.input field={{f, :message}} type="text" label="Message" />
-    <.input field={{f, :tags}} type="text" label="Tags" />
+      <:actions>
+        <.button phx-disable-with="Searching events...">Search</.button>
+      </:actions>
+    </.simple_form>
+  </div>
 
-    <:actions>
-      <.button phx-disable-with="Searching events...">Search</.button>
-    </:actions>
-  </.simple_form>
-</div>
-
-<ol :if={@events !== []}>
-  <li :for={event <- @events}>
-    <h3><%= event.name %></h3>
-    <p><%= event.message %></p>
-    <ul :if={event.tags !== []}>
-      <li :for={tag <- event.tags}><%= tag %></li>
-    </ul>
-    <hr />
-  </li>
-</ol>
+  <ol :if={@events !== []}>
+    <li :for={event <- @events}>
+      <h3><%= event.name %></h3>
+      <p><%= event.message %></p>
+      <ul :if={event.tags !== []}>
+        <li :for={tag <- event.tags}><%= tag %></li>
+      </ul>
+      <hr />
+    </li>
+  </ol>
+</.app_main>

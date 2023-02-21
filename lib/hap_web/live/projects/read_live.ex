@@ -27,7 +27,8 @@ defmodule HapWeb.Projects.ReadLive do
     {:noreply,
      socket
      |> assign_changeset(params)
-     |> assign_events()}
+     |> assign_events()
+     |> assign_page_title()}
   end
 
   defp assign_changeset(socket, params),
@@ -37,4 +38,7 @@ defmodule HapWeb.Projects.ReadLive do
     filters = Ecto.Changeset.apply_changes(changeset)
     assign(socket, :events, Projects.list_events_by_project(project, filters))
   end
+
+  defp assign_page_title(%{assigns: %{current_project: project}} = socket),
+    do: assign(socket, :page_title, project.name)
 end
