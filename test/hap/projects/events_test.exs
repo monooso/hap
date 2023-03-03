@@ -4,8 +4,8 @@ defmodule Hap.Projects.EventsTest do
   alias Ecto.Changeset
   alias Ecto.Query
   alias Hap.Projects.Events
+  alias Hap.Projects.EventQuery
   alias HapSchemas.Projects.Event
-  alias HapSchemas.Ui.EventQuery
 
   describe "list_events_by_project_query/2" do
     setup do
@@ -22,7 +22,7 @@ defmodule Hap.Projects.EventsTest do
       %{id: event_id} = insert(:event, project: project)
 
       assert [%Event{id: ^event_id}] =
-               Events.list_events_by_project_query(project, %EventQuery{}) |> Repo.all()
+               Events.list_events_by_project_query(project.id, %EventQuery{}) |> Repo.all()
     end
 
     test "it limits results to events with a name containing the given string", %{
@@ -33,7 +33,7 @@ defmodule Hap.Projects.EventsTest do
       %{id: event_id} = insert(:event, project: project, name: "Jim Bob")
 
       assert [%Event{id: ^event_id}] =
-               Events.list_events_by_project_query(project, %EventQuery{name: "jim bo"})
+               Events.list_events_by_project_query(project.id, %EventQuery{name: "jim bo"})
                |> Repo.all()
     end
 
@@ -49,7 +49,7 @@ defmodule Hap.Projects.EventsTest do
         )
 
       assert [%Event{id: ^event_id}] =
-               Events.list_events_by_project_query(project, %EventQuery{message: "around bar"})
+               Events.list_events_by_project_query(project.id, %EventQuery{message: "around bar"})
                |> Repo.all()
     end
 
@@ -60,7 +60,21 @@ defmodule Hap.Projects.EventsTest do
         insert(:event, project: project, tags: ["alpha", "bravo", "charlie", "delta"])
 
       assert [%Event{id: ^event_id}] =
-               Events.list_events_by_project_query(project, %EventQuery{tags: "bravo, delta"})
+               Events.list_events_by_project_query(project.id, %EventQuery{
+                 tags: ["bravo", "delta"]
+               })
+               |> Repo.all()
+    end
+
+    test "it normalizes the tags", %{project: project} do
+      insert(:event, project: project, tags: ["alpha", "bravo"])
+
+      %{id: event_id} = insert(:event, project: project, tags: ["bravo", "charlie"])
+
+      assert [%Event{id: ^event_id}] =
+               Events.list_events_by_project_query(project.id, %EventQuery{
+                 tags: ["Bravo", " Charlie  "]
+               })
                |> Repo.all()
     end
 
@@ -72,7 +86,7 @@ defmodule Hap.Projects.EventsTest do
         insert(:event, project: project, name: "Order placed", message: "Break out the champers")
 
       assert [%Event{id: ^event_id}] =
-               Events.list_events_by_project_query(project, %EventQuery{
+               Events.list_events_by_project_query(project.id, %EventQuery{
                  message: "the champ",
                  name: "placed"
                })

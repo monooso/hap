@@ -4,11 +4,11 @@ defmodule Hap.Projects do
   import Ecto.Query, only: [from: 2]
   alias Ecto.Changeset
   alias Hap.Projects
+  alias Hap.Projects.EventQuery
   alias Hap.Repo
   alias HapSchemas.Accounts.Organization
   alias HapSchemas.Projects.Event
   alias HapSchemas.Projects.Project
-  alias HapSchemas.Ui.EventQuery
 
   @doc """
   Creates an event for the given project with the given attributes.
@@ -42,13 +42,6 @@ defmodule Hap.Projects do
     do: Project.insert_changeset(%Project{}, attrs)
 
   @doc """
-  Returns a changeset for filtering events.
-  """
-  @spec event_query_changeset(EventQuery.t() | Changeset.t(), map()) :: Changeset.t()
-  def event_query_changeset(struct_or_changeset, attrs),
-    do: EventQuery.changeset(struct_or_changeset, attrs)
-
-  @doc """
   Returns the project identified by the given id.
 
   Raises an `Ecto.NoResultsError` if the project does not exist.
@@ -78,8 +71,13 @@ defmodule Hap.Projects do
   given filters.
   """
   @spec list_events_by_project(Integer.t() | Project.t(), EventQuery.t()) :: list(Event.t())
-  def list_events_by_project(project, filters \\ %EventQuery{}),
-    do: Projects.Events.list_events_by_project_query(project, filters) |> Repo.all()
+  def list_events_by_project(project_or_id, filters \\ %EventQuery{})
+
+  def list_events_by_project(%Project{id: id}, filters),
+    do: list_events_by_project(id, filters)
+
+  def list_events_by_project(project_id, filters),
+    do: Projects.Events.list_events_by_project_query(project_id, filters) |> Repo.all()
 
   @doc """
   Returns a list of projects belonging to the given organization.

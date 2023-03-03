@@ -96,6 +96,7 @@ defmodule HapWeb.Router do
       on_mount: [{HapWeb.UserAuth, :ensure_authenticated}] do
       live "/", Projects.BrowseLive, :browse
       live "/:project_slug", Projects.ReadLive, :read
+      live "/:project_slug/review", Projects.ReviewLive
     end
   end
 end

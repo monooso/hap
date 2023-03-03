@@ -1,23 +1,49 @@
 defmodule Hap.Projects.Events do
   @moduledoc false
 
-  import Ecto.Query, only: [from: 2]
+  import Ecto.Query, warn: false
   alias Ecto.Changeset
   alias Ecto.Query
+  alias Hap.Projects.EventQuery
   alias HapSchemas.Projects.Event
-  alias HapSchemas.Projects.Project
-  alias HapSchemas.Ui.EventQuery
 
   @doc """
   Returns an Ecto.Query for retrieving the events belonging to the given project. Applies the
-  conditions defined in the given EventQuery.
+  conditions defined in the given event query filters.
   """
-  @spec list_events_by_project_query(Integer.t() | Project.t(), EventQuery.t()) :: Query.t()
-  def list_events_by_project_query(%Project{id: id}, filters),
-    do: list_events_by_project_query(id, filters)
+  @spec list_events_by_project_query(Integer.t(), EventQuery.t()) :: Query.t()
+  def list_events_by_project_query(project_id, filters) do
+    from(Event)
+    |> filter_by_project(project_id)
+    |> filter_by_message(filters)
+    |> filter_by_name(filters)
+    |> filter_by_tags(filters)
+  end
 
-  def list_events_by_project_query(project_id, filters),
-    do: from(e in Event, where: e.project_id == ^project_id) |> apply_event_query_filters(filters)
+  defp filter_by_message(query, %{message: ""}), do: query
+
+  defp filter_by_message(query, %{message: message}),
+    do: from(e in query, where: ilike(e.message, ^"%#{message}%"))
+
+  defp filter_by_name(query, %{name: ""}), do: query
+
+  defp filter_by_name(query, %{name: name}),
+    do: from(e in query, where: ilike(e.name, ^"%#{name}%"))
+
+  defp filter_by_project(query, project_id),
+    do: from(e in query, where: e.project_id == ^project_id)
+
+  defp filter_by_tags(query, %{tags: []}), do: query
+
+  defp filter_by_tags(query, %{tags: [""]}), do: query
+
+  defp filter_by_tags(query, %{tags: tags}) do
+    tags
+    |> Enum.map(&normalize_string/1)
+    |> Enum.reduce(query, fn tag, query ->
+      from(e in query, where: ^tag in e.tags)
+    end)
+  end
 
   @doc """
   Normalizes the given changeset, if it contains valid changes.
@@ -34,32 +60,6 @@ defmodule Hap.Projects.Events do
   end
 
   def normalize_event_changeset(changeset), do: changeset
-
-  @spec apply_event_query_filters(Query.t(), EventQuery.t()) :: Query.t()
-  defp apply_event_query_filters(query, filters) do
-    filters
-    |> Map.from_struct()
-    |> Enum.reduce(query, fn {key, value}, query ->
-      apply_event_query_filter(query, key, value)
-    end)
-  end
-
-  @spec apply_event_query_filter(Query.t(), atom, any) :: Query.t()
-  defp apply_event_query_filter(query, :message, message) when not is_nil(message),
-    do: from(e in query, where: ilike(e.message, ^"%#{message}%"))
-
-  defp apply_event_query_filter(query, :name, name) when not is_nil(name),
-    do: from(e in query, where: ilike(e.name, ^"%#{name}%"))
-
-  defp apply_event_query_filter(query, :tags, tags) when not is_nil(tags) do
-    String.split(tags, ",")
-    |> Enum.map(&normalize_string/1)
-    |> Enum.reduce(query, fn tag, query ->
-      from(e in query, where: ^tag in e.tags)
-    end)
-  end
-
-  defp apply_event_query_filter(query, _key, _value), do: query
 
   @spec deduplicate_tags(Changeset.t()) :: Changeset.t()
   defp deduplicate_tags(changeset) do

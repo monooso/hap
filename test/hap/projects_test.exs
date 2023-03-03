@@ -3,9 +3,9 @@ defmodule Hap.ProjectsTest do
   import Hap.Factory
   alias Ecto.Changeset
   alias Hap.Projects
+  alias Hap.Projects.EventQuery
   alias HapSchemas.Projects.Event
   alias HapSchemas.Projects.Project
-  alias HapSchemas.Ui.EventQuery
 
   describe "create_event/2" do
     setup do
