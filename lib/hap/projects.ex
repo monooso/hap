@@ -78,9 +78,7 @@ defmodule Hap.Projects do
   given filters.
   """
   @spec list_events_by_project(Integer.t() | Project.t(), EventQuery.t()) :: list(Event.t())
-  def list_events_by_project(project, filters \\ %EventQuery{})
-
-  def list_events_by_project(project, filters),
+  def list_events_by_project(project, filters \\ %EventQuery{}),
     do: Projects.Events.list_events_by_project_query(project, filters) |> Repo.all()
 
   @doc """

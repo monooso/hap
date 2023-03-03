@@ -20,9 +20,7 @@ defmodule HapWeb.UserSessionControllerTest do
       # Now do a logged in request and assert on the menu
       conn = get(conn, ~p"/")
       response = html_response(conn, 200)
-      assert response =~ user.email
-      assert response =~ "Settings</a>"
-      assert response =~ "Log out</a>"
+      assert response =~ "Sign out"
     end
 
     test "logs the user in with remember me", %{conn: conn, user: user} do

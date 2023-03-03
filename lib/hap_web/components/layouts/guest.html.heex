@@ -1,10 +1,20 @@
-<ul>
-  <li>
-    <.link navigate={~p"/users/log_in"} data-id="sign-in">Sign in</.link>
-  </li>
-  <li>
-    <.link navigate={~p"/users/register"} data-id="register">Register</.link>
-  </li>
-</ul>
+<header class="border-b mb-8 pb-8">
+  <p>This is the guest.html.heex layout.</p>
 
-<%= @inner_content %>
+  <nav>
+    <ul>
+      <li>
+        <.link navigate={~p"/users/log_in"} data-id="sign-in">Sign in</.link>
+      </li>
+      <li>
+        <.link navigate={~p"/users/register"} data-id="register">Register</.link>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+  <%= @inner_content %>
+</main>
+
+<footer class="border-t mt-8 pt-8">Page footer goes here.</footer>
