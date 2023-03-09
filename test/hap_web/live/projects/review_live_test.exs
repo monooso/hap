@@ -86,6 +86,7 @@ defmodule HapWeb.Projects.ReviewLiveTest do
         |> form("[data-test-id='filter-form']", %{"message" => "worst"})
         |> render_submit()
 
+      assert_patched(view, ~p"/projects/#{project}/review?#{[message: "worst"]}")
       assert html =~ "It was the worst of times"
       refute html =~ "It was the best of times"
     end
@@ -109,6 +110,21 @@ defmodule HapWeb.Projects.ReviewLiveTest do
       assert html =~ "Sale 01"
       assert html =~ "Sale 02"
       refute html =~ "Return 01"
+    end
+
+    test "the url contains the filters", %{conn: conn, project: project} do
+      insert(:event, project: project)
+      insert(:event, project: project)
+
+      filters = %{"message" => "Hola", "name" => "Cleetus", "tags" => "alpha, bravo"}
+
+      {:ok, view, html} = live(conn, ~p"/projects/#{project}/review")
+
+      view
+      |> form("[data-test-id='filter-form']", filters)
+      |> render_submit()
+
+      assert_patched(view, ~p"/projects/#{project}/review?#{filters}")
     end
   end
 end
