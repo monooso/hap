@@ -5,5 +5,7 @@ defmodule Hap.Projects.EventQuery do
 
   defstruct name: "",
             message: "",
+            sort_by: :inserted_at,
+            sort_order: :desc,
             tags: []
 end

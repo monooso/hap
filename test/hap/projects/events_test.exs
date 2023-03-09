@@ -92,6 +92,28 @@ defmodule Hap.Projects.EventsTest do
                })
                |> Repo.all()
     end
+
+    test "it orders results by the specified column", %{project: project} do
+      insert(:event, project: project, name: "Bravo")
+      insert(:event, project: project, name: "Alpha")
+      insert(:event, project: project, name: "Charlie")
+
+      assert ["Alpha", "Bravo", "Charlie"] =
+               Events.list_events_by_project_query(project.id, %EventQuery{
+                 sort_by: :name,
+                 sort_order: :asc
+               })
+               |> Repo.all()
+               |> Enum.map(& &1.name)
+
+      assert ["Charlie", "Bravo", "Alpha"] =
+               Events.list_events_by_project_query(project.id, %EventQuery{
+                 sort_by: :name,
+                 sort_order: :desc
+               })
+               |> Repo.all()
+               |> Enum.map(& &1.name)
+    end
   end
 
   describe "normalize_event_changeset/1" do

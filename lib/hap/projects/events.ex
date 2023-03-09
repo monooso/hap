@@ -18,7 +18,14 @@ defmodule Hap.Projects.Events do
     |> filter_by_message(filters)
     |> filter_by_name(filters)
     |> filter_by_tags(filters)
+    |> apply_sorting(filters)
   end
+
+  defp apply_sorting(query, %{sort_by: sort_by, sort_order: sort_order})
+       when is_atom(sort_by) and is_atom(sort_order),
+       do: from(e in query, order_by: [{^sort_order, ^sort_by}])
+
+  defp apply_sorting(query, _), do: query
 
   defp filter_by_message(query, %{message: ""}), do: query
 
