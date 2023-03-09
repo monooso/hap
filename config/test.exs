@@ -1,8 +1,5 @@
 import Config
 
-# Only in tests, remove the complexity from the password hashing algorithm
-config :bcrypt_elixir, :log_rounds, 1
-
 # Configure your database
 #
 # The MIX_TEST_PARTITION environment variable can be used
@@ -20,7 +17,7 @@ config :hap, Hap.Repo,
 # you can enable the server option below.
 config :hap, HapWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
-  secret_key_base: "XflsQ0ypBxmeTLxdTKw2Q1/jbhv+YmzDLTwWBcxc8SIhN/pewmvezKT8CBy1xi8T",
+  secret_key_base: "KupVMbJaLD0jZQIM0cdQM+Aho39+KuKaOVvHQLuAjQbdvBTwfdJzGQbHxe2THEpH",
   server: false
 
 # In test we don't send emails.

@@ -7,7 +7,7 @@ defmodule HapWeb.Endpoint do
   @session_options [
     store: :cookie,
     key: "_hap_key",
-    signing_salt: "UszzYwAI",
+    signing_salt: "AJS304J4",
     same_site: "Lax"
   ]
 

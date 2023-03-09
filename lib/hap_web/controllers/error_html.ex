@@ -1,6 +1,4 @@
 defmodule HapWeb.ErrorHTML do
-  @moduledoc "Functions for rendering HTML error responses."
-
   use HapWeb, :html
 
   # If you want to customize your error pages,

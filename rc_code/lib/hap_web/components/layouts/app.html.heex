@@ -1,0 +1,41 @@
+<.flash kind={:info} title="Success!" flash={@flash} />
+<.flash kind={:error} title="Error!" flash={@flash} />
+<.flash
+  id="disconnected"
+  kind={:error}
+  title="We can't find the internet"
+  close={false}
+  autoshow={false}
+  phx-disconnected={show("#disconnected")}
+  phx-connected={hide("#disconnected")}
+>
+  Attempting to reconnect <Heroicons.arrow_path class="ml-1 w-3 h-3 inline animate-spin" />
+</.flash>
+
+<header class="border-b mb-8 pb-8">
+  <p>This is the app.html.heex layout.</p>
+
+  <nav>
+    <ul>
+      <li>
+        <.link navigate={~p"/"}>Dashboard</.link>
+      </li>
+      <li>
+        <.link navigate={~p"/projects"}>Projects</.link>
+      </li>
+      <hr />
+      <li>
+        <.link navigate={~p"/users/settings"}>Settings</.link>
+      </li>
+      <li>
+        <.link href={~p"/users/log_out"} method="delete">Sign out</.link>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+  <%= @inner_content %>
+</main>
+
+<footer class="border-t mt-8 pt-8">Page footer goes here.</footer>

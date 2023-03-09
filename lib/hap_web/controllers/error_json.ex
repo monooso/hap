@@ -1,6 +1,4 @@
 defmodule HapWeb.ErrorJSON do
-  @moduledoc "Functions for rendering JSON error responses."
-
   # If you want to customize a particular status code,
   # you may add your own clauses, such as:
   #

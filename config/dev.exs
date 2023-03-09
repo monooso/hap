@@ -23,7 +23,7 @@ config :hap, HapWeb.Endpoint,
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
-  secret_key_base: "QyKmQ/IrV6Ja18iqrW26ccVmJb40IjqDFaCFzIEpoI3/5h3gbvXI+9LtHbSdg8G8",
+  secret_key_base: "CMjzfEtq18fra8/vxXIlYDum0fM15C3krWBxtjfgXV7MPWEWMMkQlFZO1dKjrpMT",
   watchers: [
     esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
     tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}

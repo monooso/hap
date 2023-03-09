@@ -18,7 +18,7 @@ config :hap, HapWeb.Endpoint,
     layout: false
   ],
   pubsub_server: Hap.PubSub,
-  live_view: [signing_salt: "u1YbE2VZ"]
+  live_view: [signing_salt: "E7hcaomz"]
 
 # Configures the mailer
 #

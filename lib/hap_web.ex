@@ -51,14 +51,9 @@ defmodule HapWeb do
 
   def live_view do
     quote do
-      use Phoenix.LiveView, layout: {HapWeb.Layouts, :app}
-      unquote(html_helpers())
-    end
-  end
+      use Phoenix.LiveView,
+        layout: {HapWeb.Layouts, :app}
 
-  def guest_live_view do
-    quote do
-      use Phoenix.LiveView, layout: {HapWeb.Layouts, :guest}
       unquote(html_helpers())
     end
   end
