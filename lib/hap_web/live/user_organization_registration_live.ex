@@ -44,7 +44,7 @@ defmodule HapWeb.UserOrganizationRegistrationLive do
          |> put_flash(:info, "Organization created")
          |> push_redirect(to: ~p"/")}
 
-      # TODO: How can we provide a meaningful error message if the "create member" step fails?
+      # How can we provide a meaningful error message if the "create member" step fails?
       {:error, :organization, %Ecto.Changeset{} = changeset, _changes} ->
         {:noreply,
          socket
