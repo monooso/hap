@@ -45,41 +45,60 @@ defmodule HapWeb.Router do
     end
   end
 
-  ## Authentication routes
-
+  # ----------------------------------------------------------------------------------------------
+  # Sign-up, registration, and log-in
+  # ----------------------------------------------------------------------------------------------
   scope "/", HapWeb do
-    pipe_through [:browser, :redirect_if_user_is_authenticated]
+    pipe_through([:browser, :redirect_if_user_is_authenticated])
 
     live_session :redirect_if_user_is_authenticated,
       on_mount: [{HapWeb.UserAuth, :redirect_if_user_is_authenticated}] do
-      live "/users/register", UserRegistrationLive, :new
-      live "/users/log_in", UserLoginLive, :new
-      live "/users/reset_password", UserForgotPasswordLive, :new
-      live "/users/reset_password/:token", UserResetPasswordLive, :edit
+      live("/users/register", UserRegistrationLive, :new)
+      live("/users/log_in", UserLoginLive, :new)
+      live("/users/reset_password", UserForgotPasswordLive, :new)
+      live("/users/reset_password/:token", UserResetPasswordLive, :edit)
     end
 
-    post "/users/log_in", UserSessionController, :create
+    post("/users/log_in", UserSessionController, :create)
   end
 
+  # ----------------------------------------------------------------------------------------------
+  # User settings
+  # ----------------------------------------------------------------------------------------------
   scope "/", HapWeb do
-    pipe_through [:browser, :require_authenticated_user]
+    pipe_through([:browser, :require_authenticated_user])
 
     live_session :require_authenticated_user,
       on_mount: [{HapWeb.UserAuth, :ensure_authenticated}] do
-      live "/users/settings", UserSettingsLive, :edit
-      live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
+      live("/users/settings", UserSettingsLive, :edit)
+      live("/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email)
     end
   end
 
+  # ----------------------------------------------------------------------------------------------
+  # Log-out, confirm email address
+  # ----------------------------------------------------------------------------------------------
   scope "/", HapWeb do
-    pipe_through [:browser]
+    pipe_through([:browser])
 
-    delete "/users/log_out", UserSessionController, :delete
+    delete("/users/log_out", UserSessionController, :delete)
 
     live_session :current_user,
       on_mount: [{HapWeb.UserAuth, :mount_current_user}] do
-      live "/users/confirm/:token", UserConfirmationLive, :edit
-      live "/users/confirm", UserConfirmationInstructionsLive, :new
+      live("/users/confirm/:token", UserConfirmationLive, :edit)
+      live("/users/confirm", UserConfirmationInstructionsLive, :new)
+    end
+  end
+
+  # ----------------------------------------------------------------------------------------------
+  # Register first organization
+  # ----------------------------------------------------------------------------------------------
+  scope "/", HapWeb do
+    pipe_through([:browser, :require_authenticated_user, :redirect_if_user_has_organization])
+
+    live_session :register_organization,
+      on_mount: [{HapWeb.UserAuth, :ensure_authenticated}] do
+      live("/users/register_organization", UserOrganizationRegistrationLive, :new)
     end
   end
 end
