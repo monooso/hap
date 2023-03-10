@@ -2,6 +2,7 @@ defmodule HapWeb.UserAuthTest do
   use HapWeb.ConnCase, async: true
 
   import Hap.AccountsFixtures
+  import Hap.Factory
   alias Phoenix.LiveView
   alias Hap.Accounts
   alias HapWeb.UserAuth
@@ -221,6 +222,64 @@ defmodule HapWeb.UserAuthTest do
 
     test "does not redirect if user is not authenticated", %{conn: conn} do
       conn = UserAuth.redirect_if_user_is_authenticated(conn, [])
+      refute conn.halted
+      refute conn.status
+    end
+  end
+
+  describe "require_user_has_organization/2" do
+    test "raises if user is not authenticated", %{conn: conn} do
+      assert_raise FunctionClauseError, fn ->
+        UserAuth.require_user_has_organization(conn, [])
+      end
+    end
+
+    test "redirects if user is not associated with an organization", %{conn: conn, user: user} do
+      conn =
+        conn
+        |> fetch_flash()
+        |> assign(:current_user, user)
+        |> UserAuth.require_user_has_organization([])
+
+      assert conn.halted
+      assert redirected_to(conn) == ~p"/users/register_organization"
+    end
+
+    test "stores the path to redirect to on GET", %{conn: conn, user: user} do
+      conn = assign(conn, :current_user, user)
+
+      halted_conn =
+        %{conn | path_info: ["foo"], query_string: ""}
+        |> fetch_flash()
+        |> UserAuth.require_user_has_organization([])
+
+      assert halted_conn.halted
+      assert get_session(halted_conn, :user_return_to) == "/foo"
+
+      halted_conn =
+        %{conn | path_info: ["foo"], query_string: "bar=baz"}
+        |> fetch_flash()
+        |> UserAuth.require_user_has_organization([])
+
+      assert halted_conn.halted
+      assert get_session(halted_conn, :user_return_to) == "/foo?bar=baz"
+
+      halted_conn =
+        %{conn | path_info: ["foo"], query_string: "bar", method: "POST"}
+        |> fetch_flash()
+        |> UserAuth.require_user_has_organization([])
+
+      assert halted_conn.halted
+      refute get_session(halted_conn, :user_return_to)
+    end
+
+    test "does not redirect if authenticated user is associated with an organization", %{
+      conn: conn,
+      user: user
+    } do
+      insert(:member, user: user)
+
+      conn = conn |> assign(:current_user, user) |> UserAuth.require_user_has_organization([])
       refute conn.halted
       refute conn.status
     end

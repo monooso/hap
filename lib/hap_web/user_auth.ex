@@ -211,6 +211,26 @@ defmodule HapWeb.UserAuth do
     end
   end
 
+  @doc """
+  Used for routes that require a user be associated with an organization.
+
+  Assumes that the authenticated user is assigned to the conn. Otherwise we're just doing the same
+  work as `require_authenticated_user`.
+  """
+  def require_user_has_organization(%{assigns: %{current_user: user}} = conn, _opts)
+      when is_struct(user, HapSchemas.Accounts.User) do
+    organizations = Accounts.list_organizations_by_user(user)
+
+    if Enum.empty?(organizations) do
+      conn
+      |> maybe_store_return_to()
+      |> redirect(to: ~p"/users/register_organization")
+      |> halt()
+    else
+      conn
+    end
+  end
+
   defp put_token_in_session(conn, token) do
     conn
     |> put_session(:user_token, token)
