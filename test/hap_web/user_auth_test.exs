@@ -213,6 +213,32 @@ defmodule HapWeb.UserAuthTest do
     end
   end
 
+  describe "redirect_if_user_has_organization/2" do
+    test "raises if user is not authenticated", %{conn: conn} do
+      assert_raise FunctionClauseError, fn ->
+        UserAuth.redirect_if_user_has_organization(conn, [])
+      end
+    end
+
+    test "redirects if user is associated with an organization", %{conn: conn, user: user} do
+      insert(:member, user: user)
+
+      conn = conn |> assign(:current_user, user) |> UserAuth.redirect_if_user_has_organization([])
+
+      assert conn.halted
+      assert redirected_to(conn) == ~p"/"
+    end
+
+    test "does not redirect if user is not associated with an organization", %{
+      conn: conn,
+      user: user
+    } do
+      conn = conn |> assign(:current_user, user) |> UserAuth.redirect_if_user_has_organization([])
+      refute conn.halted
+      refute conn.status
+    end
+  end
+
   describe "redirect_if_user_is_authenticated/2" do
     test "redirects if user is authenticated", %{conn: conn, user: user} do
       conn = conn |> assign(:current_user, user) |> UserAuth.redirect_if_user_is_authenticated([])

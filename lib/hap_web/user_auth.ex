@@ -3,7 +3,6 @@ defmodule HapWeb.UserAuth do
 
   import Plug.Conn
   import Phoenix.Controller
-
   alias Hap.Accounts
 
   # Make the remember me cookie valid for 60 days.
@@ -178,6 +177,23 @@ defmodule HapWeb.UserAuth do
         Accounts.get_user_by_session_token(user_token)
       end
     end)
+  end
+
+  @doc """
+  Used for routes that cannot be accessed by a user that is associated with an organization.
+
+  Assumes that the authenticated user is assigned to the conn. Otherwise we're just doing the same
+  work as `require_authenticated_user`.
+  """
+  def redirect_if_user_has_organization(%{assigns: %{current_user: user}} = conn, _opts)
+      when is_struct(user, HapSchemas.Accounts.User) do
+    organizations = Accounts.list_organizations_by_user(user)
+
+    if Enum.empty?(organizations) do
+      conn
+    else
+      conn |> redirect(to: ~p"/") |> halt()
+    end
   end
 
   @doc """
