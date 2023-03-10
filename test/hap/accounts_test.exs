@@ -2,10 +2,21 @@ defmodule Hap.AccountsTest do
   use Hap.DataCase
   import Hap.AccountsFixtures
   import Hap.Factory
+  alias Ecto.Changeset
   alias Hap.Accounts
   alias HapSchemas.Accounts.User
   alias HapSchemas.Accounts.UserToken
 
+  describe "create_member_changeset/1" do
+    test "it returns a valid changeset when given valid data" do
+      assert %Changeset{valid?: true} =
+               Accounts.create_member_changeset(%{organization_id: 123, user_id: 456})
+    end
+
+    test "it returns an invalid changeset when given invalid data" do
+      assert %Changeset{valid?: false} = Accounts.create_member_changeset(%{})
+    end
+  end
   describe "get_user_by_email/1" do
     test "does not return the user if the email does not exist" do
       refute Accounts.get_user_by_email("unknown@example.com")

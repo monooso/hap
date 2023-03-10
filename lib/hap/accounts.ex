@@ -7,8 +7,15 @@ defmodule Hap.Accounts do
   alias HapSchemas.Accounts.Organization
   alias Hap.Accounts.UserNotifier
   alias Hap.Repo
+  alias HapSchemas.Accounts.Member
   alias HapSchemas.Accounts.User
   alias HapSchemas.Accounts.UserToken
+
+  @doc """
+  Returns a changeset for creating a member.
+  """
+  def create_member_changeset(attrs),
+    do: Member.insert_changeset(%Member{}, attrs)
 
   ## Database getters
 
