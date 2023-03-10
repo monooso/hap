@@ -1,6 +1,7 @@
 defmodule Hap.AccountsTest do
   use Hap.DataCase
   import Hap.AccountsFixtures
+  import Hap.Factory
   alias Hap.Accounts
   alias HapSchemas.Accounts.User
   alias HapSchemas.Accounts.UserToken
@@ -44,6 +45,26 @@ defmodule Hap.AccountsTest do
     test "returns the user with the given id" do
       %{id: id} = user = user_fixture()
       assert %User{id: ^id} = Accounts.get_user!(user.id)
+    end
+  end
+
+  describe "list_organizations_by_user/1" do
+    test "returns a list of organizations associated with the given user" do
+      user = user_fixture()
+
+      expected =
+        insert_list(3, :member, user: user)
+        |> Enum.map(& &1.organization.name)
+        |> Enum.sort()
+
+      # Red herring
+      insert(:organization)
+
+      assert ^expected =
+               user
+               |> Accounts.list_organizations_by_user()
+               |> Enum.map(& &1.name)
+               |> Enum.sort()
     end
   end
 

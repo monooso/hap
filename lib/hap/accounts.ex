@@ -4,6 +4,7 @@ defmodule Hap.Accounts do
   """
 
   import Ecto.Query, warn: false
+  alias HapSchemas.Accounts.Organization
   alias Hap.Accounts.UserNotifier
   alias Hap.Repo
   alias HapSchemas.Accounts.User
@@ -186,6 +187,23 @@ defmodule Hap.Accounts do
   """
   def change_user_password(user, attrs \\ %{}) do
     User.password_changeset(user, attrs, hash_password: false)
+  end
+
+  @doc """
+  Returns a list of organizations associated with the given user.
+  """
+  @spec list_organizations_by_user(User.t() | Integer.t()) :: [Organization.t()]
+  def list_organizations_by_user(%User{id: id}) do
+    list_organizations_by_user(id)
+  end
+
+  def list_organizations_by_user(user_id) do
+    from(
+      o in Organization,
+      join: u in assoc(o, :users),
+      where: u.id == ^user_id
+    )
+    |> Repo.all()
   end
 
   @doc """
