@@ -4,6 +4,7 @@ defmodule Hap.AccountsTest do
   import Hap.Factory
   alias Ecto.Changeset
   alias Hap.Accounts
+  alias HapSchemas.Accounts.Organization
   alias HapSchemas.Accounts.User
   alias HapSchemas.Accounts.UserToken
 
@@ -17,6 +18,32 @@ defmodule Hap.AccountsTest do
       assert %Changeset{valid?: false} = Accounts.create_member_changeset(%{})
     end
   end
+
+  describe "create_organization/2" do
+    test "it returns an {:ok, multi_result} tuple when given valid data" do
+      owner = user_fixture()
+
+      assert {:ok, %{organization: %Organization{}}} =
+               Accounts.create_organization(owner, %{name: "Buymore"})
+    end
+
+    test "it returns an {:error, multi_errors} tuple when given invalid data" do
+      owner = user_fixture()
+
+      assert {:error, :organization, _value, _changes} = Accounts.create_organization(owner, %{})
+    end
+  end
+
+  describe "create_organization_changeset/1" do
+    test "it returns a valid changeset when given valid data" do
+      assert %Changeset{valid?: true} = Accounts.create_organization_changeset(%{name: "Wibble"})
+    end
+
+    test "it returns an invalid changeset when given invalid data" do
+      assert %Changeset{valid?: false} = Accounts.create_organization_changeset(%{})
+    end
+  end
+
   describe "get_user_by_email/1" do
     test "does not return the user if the email does not exist" do
       refute Accounts.get_user_by_email("unknown@example.com")

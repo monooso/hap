@@ -4,10 +4,11 @@ defmodule Hap.Accounts do
   """
 
   import Ecto.Query, warn: false
-  alias HapSchemas.Accounts.Organization
+  alias Ecto.Multi
   alias Hap.Accounts.UserNotifier
   alias Hap.Repo
   alias HapSchemas.Accounts.Member
+  alias HapSchemas.Accounts.Organization
   alias HapSchemas.Accounts.User
   alias HapSchemas.Accounts.UserToken
 
@@ -16,6 +17,31 @@ defmodule Hap.Accounts do
   """
   def create_member_changeset(attrs),
     do: Member.insert_changeset(%Member{}, attrs)
+
+  @doc """
+  Creates an organization with the given attributes, belonging to the given user.
+  """
+  @spec create_organization(User.t(), map()) ::
+          {:ok, map()} | {:error, atom(), Changeset.t(), map()}
+  def create_organization(owner, attrs) do
+    Multi.new()
+    |> Multi.put(:owner, owner)
+    |> Multi.put(:attrs, attrs)
+    |> Multi.insert(:organization, fn %{attrs: attrs} ->
+      create_organization_changeset(attrs)
+    end)
+    |> Multi.insert(:member, fn %{organization: organization, owner: owner} ->
+      create_member_changeset(%{organization_id: organization.id, user_id: owner.id})
+    end)
+    |> Repo.transaction()
+  end
+
+  @doc """
+  Returns a changeset for creating an organization.
+  """
+  @spec create_organization_changeset(map()) :: Ecto.Changeset.t()
+  def create_organization_changeset(attrs),
+    do: Organization.insert_changeset(%Organization{}, attrs)
 
   ## Database getters
 
