@@ -3,6 +3,8 @@ defmodule HapSchemas.Accounts.User do
 
   use Ecto.Schema
   import Ecto.Changeset
+  alias HapSchemas.Accounts.Member
+  alias HapSchemas.Accounts.Organization
   alias HapSchemas.Accounts.User
 
   schema "users" do
@@ -10,6 +12,9 @@ defmodule HapSchemas.Accounts.User do
     field(:password, :string, virtual: true, redact: true)
     field(:hashed_password, :string, redact: true)
     field(:confirmed_at, :naive_datetime)
+
+    has_many(:memberships, Member)
+    many_to_many(:organizations, Organization, join_through: Member)
 
     timestamps()
   end
