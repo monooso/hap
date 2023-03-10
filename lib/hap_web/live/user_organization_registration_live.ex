@@ -14,7 +14,9 @@ defmodule HapWeb.UserOrganizationRegistrationLive do
         <.input field={@form[:name]} type="text" label="Organization name" required />
 
         <:actions>
-          <.button phx-disable-with="Creating your organization..." class="w-full">Create your organization</.button>
+          <.button phx-disable-with="Creating your organization..." class="w-full">
+            Create your organization
+          </.button>
         </:actions>
       </.simple_form>
     </div>
