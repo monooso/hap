@@ -25,7 +25,8 @@ config :hap, HapWeb.Endpoint,
   debug_errors: true,
   secret_key_base: "Zlddi5/7tHUeXlwF3byOw2hsZRCLGSIGr2qyxYxKC5UaJHODw69kPHOxaU5KDdlG",
   watchers: [
-    esbuild: {Esbuild, :install_and_run, [:hap, ~w(--sourcemap=inline --watch)]}
+    esbuild: {Esbuild, :install_and_run, [:hap, ~w(--sourcemap=inline --watch)]},
+    npm: ["run", "dev", cd: Path.expand("../assets", __DIR__)]
   ]
 
 # ## SSL Support

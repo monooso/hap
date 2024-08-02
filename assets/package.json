@@ -1,0 +1,14 @@
+{
+  "type": "module",
+  "devDependencies": {
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.40",
+    "postcss-import": "^16.1.0",
+    "tailwindcss": "^3.4.7",
+    "topbar": "^3.0.0"
+  },
+  "scripts": {
+    "deploy": "NODE_ENV=production tailwindcss --postcss --minify --input=css/app.css --output=../priv/static/assets/app.css",
+    "dev": "tailwindcss --postcss --watch --input=css/app.css --output=../priv/static/assets/app.css"
+  }
+}

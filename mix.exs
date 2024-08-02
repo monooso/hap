@@ -69,6 +69,7 @@ defmodule Hap.MixProject do
       "assets.setup": ["esbuild.install --if-missing"],
       "assets.build": ["esbuild hap"],
       "assets.deploy": [
+        "cmd --cd assets npm run deploy",
         "esbuild hap --minify",
         "phx.digest"
       ]
