@@ -1,0 +1,35 @@
+#!/bin/bash
+set -euo pipefail
+
+RESET='\033[0m'
+BOLD='\033[1m'
+CYAN='\033[36m'
+MAGENTA='\033[35m'
+
+main() {
+  print_step "Mix formatter check"
+  mix format --check-formatted
+  print_done
+
+  print_step "Credo checks"
+  mix credo
+  print_done
+
+  print_step "Run test suite"
+  mix test
+  print_done
+
+  print_step "Git push"
+}
+
+print_step() {
+  local -r description="$1"
+  echo -e "${MAGENTA}${BOLD}### ${description} ###${RESET}"
+}
+
+print_done() {
+  echo -e "${CYAN}Done.${RESET}"
+  echo
+}
+
+main
