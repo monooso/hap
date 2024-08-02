@@ -1,3 +1,5 @@
+import daisyui from "daisyui";
+
 /** @type {import('tailwindcss').Config} */
 export const content = [
   './js/**/*.js',
@@ -9,5 +11,5 @@ export const theme = {
   extend: {},
 };
 
-export const plugins = [];
+export const plugins = [daisyui];
 
