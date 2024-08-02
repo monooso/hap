@@ -1,4 +1,6 @@
 defmodule Hap.Accounts.UserNotifier do
+  @moduledoc false
+
   import Swoosh.Email
 
   alias Hap.Mailer

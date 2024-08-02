@@ -34,6 +34,7 @@ defmodule Hap.MixProject do
     [
       {:bandit, "~> 1.5"},
       {:bcrypt_elixir, "~> 3.1.0"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dns_cluster, "~> 0.1.1"},
       {:ecto_sql, "~> 3.10"},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},

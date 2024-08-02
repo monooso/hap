@@ -1,4 +1,6 @@
 defmodule HapWeb.UserAuth do
+  @moduledoc false
+
   use HapWeb, :verified_routes
 
   import Plug.Conn
