@@ -1,11 +1,13 @@
 defmodule Hap.Repo.Migrations.CreateOrganizations do
   use Ecto.Migration
 
-  def change do
-    create table(:organizations) do
-      add :name, :string
+  @table :organizations
 
+  def change do
+    create table(@table) do
       timestamps(type: :utc_datetime)
+
+      add :name, :string, null: false
     end
   end
 end
