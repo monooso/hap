@@ -28,6 +28,7 @@ defmodule HapWeb.ConnCase do
       import Plug.Conn
       import Phoenix.ConnTest
       import HapWeb.ConnCase
+      import Hap.Factory
     end
   end
 
@@ -45,7 +46,9 @@ defmodule HapWeb.ConnCase do
   test context.
   """
   def register_and_log_in_user(%{conn: conn}) do
-    user = Hap.AccountsFixtures.user_fixture()
+    import Hap.Factory
+
+    user = insert(:user)
     %{conn: log_in_user(conn, user), user: user}
   end
 

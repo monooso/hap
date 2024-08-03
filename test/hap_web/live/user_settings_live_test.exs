@@ -3,13 +3,12 @@ defmodule HapWeb.UserSettingsLiveTest do
 
   alias Hap.Accounts
   import Phoenix.LiveViewTest
-  import Hap.AccountsFixtures
 
   describe "Settings page" do
     test "renders settings page", %{conn: conn} do
       {:ok, _lv, html} =
         conn
-        |> log_in_user(user_fixture())
+        |> log_in_user(insert(:user))
         |> live(~p"/users/settings")
 
       assert html =~ "Change Email"
@@ -27,13 +26,13 @@ defmodule HapWeb.UserSettingsLiveTest do
 
   describe "update email form" do
     setup %{conn: conn} do
-      password = valid_user_password()
-      user = user_fixture(%{password: password})
+      password = "a very valid password"
+      user = insert(:user, password: password)
       %{conn: log_in_user(conn, user), user: user, password: password}
     end
 
     test "updates the user email", %{conn: conn, password: password, user: user} do
-      new_email = unique_user_email()
+      %{email: new_email} = build(:user)
 
       {:ok, lv, _html} = live(conn, ~p"/users/settings")
 
@@ -84,13 +83,13 @@ defmodule HapWeb.UserSettingsLiveTest do
 
   describe "update password form" do
     setup %{conn: conn} do
-      password = valid_user_password()
-      user = user_fixture(%{password: password})
+      password = "a very valid password"
+      user = insert(:user, password: password)
       %{conn: log_in_user(conn, user), user: user, password: password}
     end
 
     test "updates the user password", %{conn: conn, user: user, password: password} do
-      new_password = valid_user_password()
+      new_password = "a very valid password"
 
       {:ok, lv, _html} = live(conn, ~p"/users/settings")
 
@@ -160,8 +159,8 @@ defmodule HapWeb.UserSettingsLiveTest do
 
   describe "confirm email" do
     setup %{conn: conn} do
-      user = user_fixture()
-      email = unique_user_email()
+      user = insert(:user)
+      %{email: email} = build(:user)
 
       token =
         extract_user_token(fn url ->

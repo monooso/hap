@@ -2,56 +2,53 @@ defmodule Hap.AccountsTest do
   use Hap.DataCase
 
   import Ecto.Changeset, only: [get_change: 2]
-  import Hap.AccountsFixtures
 
   alias Hap.Accounts
   alias Hap.Accounts.User
   alias Hap.Accounts.UserToken
 
   describe "get_user_by_email/1" do
-    test "does not return the user if the email does not exist" do
+    test "it does not return the user if the email does not exist" do
       refute Accounts.get_user_by_email("unknown@example.com")
     end
 
-    test "returns the user if the email exists" do
-      %{id: id} = user = user_fixture()
-      assert %User{id: ^id} = Accounts.get_user_by_email(user.email)
+    test "it returns the user if the email exists" do
+      %{email: email, id: id} = insert(:user)
+      assert %User{id: ^id} = Accounts.get_user_by_email(email)
     end
   end
 
   describe "get_user_by_email_and_password/2" do
-    test "does not return the user if the email does not exist" do
+    test "it does not return the user if the email does not exist" do
       refute Accounts.get_user_by_email_and_password("unknown@example.com", "hello world!")
     end
 
-    test "does not return the user if the password is not valid" do
-      user = user_fixture()
-      refute Accounts.get_user_by_email_and_password(user.email, "invalid")
+    test "it does not return the user if the password is not valid" do
+      %{email: email} = insert(:user)
+      refute Accounts.get_user_by_email_and_password(email, "invalid")
     end
 
-    test "returns the user if the email and password are valid" do
-      %{id: id} = user = user_fixture()
-
-      assert %User{id: ^id} =
-               Accounts.get_user_by_email_and_password(user.email, valid_user_password())
+    test "it returns the user if the email and password are valid" do
+      %{email: email, id: id} = insert(:user, password: "so_secure")
+      assert %User{id: ^id} = Accounts.get_user_by_email_and_password(email, "so_secure")
     end
   end
 
   describe "get_user!/1" do
-    test "raises if id is invalid" do
+    test "it raises if the id is invalid" do
       assert_raise Ecto.NoResultsError, fn ->
         Accounts.get_user!(-1)
       end
     end
 
-    test "returns the user with the given id" do
-      %{id: id} = user = user_fixture()
-      assert %User{id: ^id} = Accounts.get_user!(user.id)
+    test "it returns the user with the given id" do
+      %{id: id} = insert(:user)
+      assert %User{id: ^id} = Accounts.get_user!(id)
     end
   end
 
   describe "register_user/1" do
-    test "requires email and password to be set" do
+    test "it requires the email and password to be set" do
       {:error, changeset} = Accounts.register_user(%{})
 
       assert %{
@@ -60,7 +57,7 @@ defmodule Hap.AccountsTest do
              } = errors_on(changeset)
     end
 
-    test "validates email and password when given" do
+    test "it validates the email and password when given" do
       {:error, changeset} = Accounts.register_user(%{email: "not valid", password: "not valid"})
 
       assert %{
@@ -69,15 +66,15 @@ defmodule Hap.AccountsTest do
              } = errors_on(changeset)
     end
 
-    test "validates maximum values for email and password for security" do
+    test "it validates maximum values for email and password for security" do
       too_long = String.duplicate("db", 100)
       {:error, changeset} = Accounts.register_user(%{email: too_long, password: too_long})
       assert "should be at most 160 character(s)" in errors_on(changeset).email
       assert "should be at most 72 character(s)" in errors_on(changeset).password
     end
 
-    test "validates email uniqueness" do
-      %{email: email} = user_fixture()
+    test "it validates email uniqueness" do
+      %{email: email} = insert(:user)
       {:error, changeset} = Accounts.register_user(%{email: email})
       assert "has already been taken" in errors_on(changeset).email
 
@@ -86,9 +83,11 @@ defmodule Hap.AccountsTest do
       assert "has already been taken" in errors_on(changeset).email
     end
 
-    test "registers users with a hashed password" do
-      email = unique_user_email()
-      {:ok, user} = Accounts.register_user(valid_user_attributes(email: email))
+    test "it registers users with a hashed password" do
+      %{email: email} = build(:user)
+
+      {:ok, user} = Accounts.register_user(%{email: email, password: "a valid password"})
+
       assert user.email == email
       assert is_binary(user.hashed_password)
       assert is_nil(user.confirmed_at)
@@ -97,20 +96,16 @@ defmodule Hap.AccountsTest do
   end
 
   describe "change_user_registration/2" do
-    test "returns a changeset" do
+    test "it returns a changeset" do
       assert %Ecto.Changeset{} = changeset = Accounts.change_user_registration(%User{})
       assert changeset.required == [:password, :email]
     end
 
-    test "allows fields to be set" do
-      email = unique_user_email()
-      password = valid_user_password()
+    test "it allows fields to be set" do
+      %{email: email} = build(:user)
+      password = "a valid password"
 
-      changeset =
-        Accounts.change_user_registration(
-          %User{},
-          valid_user_attributes(email: email, password: password)
-        )
+      changeset = Accounts.change_user_registration(%User{}, %{email: email, password: password})
 
       assert changeset.valid?
       assert get_change(changeset, :email) == email
@@ -120,7 +115,7 @@ defmodule Hap.AccountsTest do
   end
 
   describe "change_user_email/2" do
-    test "returns a user changeset" do
+    test "it returns a user changeset" do
       assert %Ecto.Changeset{} = changeset = Accounts.change_user_email(%User{})
       assert changeset.required == [:email]
     end
@@ -128,49 +123,44 @@ defmodule Hap.AccountsTest do
 
   describe "apply_user_email/3" do
     setup do
-      %{user: user_fixture()}
+      password = "some_random_password"
+      [password: password, user: insert(:user, password: password)]
     end
 
-    test "requires email to change", %{user: user} do
-      {:error, changeset} = Accounts.apply_user_email(user, valid_user_password(), %{})
+    test "it validates the email", %{password: password, user: user} do
+      # Unchanged
+      {:error, changeset} = Accounts.apply_user_email(user, password, %{})
       assert %{email: ["did not change"]} = errors_on(changeset)
-    end
 
-    test "validates email", %{user: user} do
-      {:error, changeset} =
-        Accounts.apply_user_email(user, valid_user_password(), %{email: "not valid"})
-
+      # Invalid
+      {:error, changeset} = Accounts.apply_user_email(user, password, %{email: "not valid"})
       assert %{email: ["must have the @ sign and no spaces"]} = errors_on(changeset)
-    end
 
-    test "validates maximum value for email for security", %{user: user} do
-      too_long = String.duplicate("db", 100)
-
+      # Too long
       {:error, changeset} =
-        Accounts.apply_user_email(user, valid_user_password(), %{email: too_long})
+        Accounts.apply_user_email(user, password, %{email: String.duplicate("x", 161)})
 
       assert "should be at most 160 character(s)" in errors_on(changeset).email
-    end
 
-    test "validates email uniqueness", %{user: user} do
-      %{email: email} = user_fixture()
-      password = valid_user_password()
-
+      # Not unique
+      %{email: email} = insert(:user)
       {:error, changeset} = Accounts.apply_user_email(user, password, %{email: email})
-
       assert "has already been taken" in errors_on(changeset).email
     end
 
-    test "validates current password", %{user: user} do
-      {:error, changeset} =
-        Accounts.apply_user_email(user, "invalid", %{email: unique_user_email()})
+    test "it validates the current password", %{user: user} do
+      %{email: email} = build(:user)
+
+      {:error, changeset} = Accounts.apply_user_email(user, "invalid_password", %{email: email})
 
       assert %{current_password: ["is not valid"]} = errors_on(changeset)
     end
 
-    test "applies the email without persisting it", %{user: user} do
-      email = unique_user_email()
-      {:ok, user} = Accounts.apply_user_email(user, valid_user_password(), %{email: email})
+    test "it applies the email without persisting it", %{password: password, user: user} do
+      %{email: email} = build(:user)
+
+      {:ok, user} = Accounts.apply_user_email(user, password, %{email: email})
+
       assert user.email == email
       assert Accounts.get_user!(user.id).email != email
     end
@@ -178,10 +168,10 @@ defmodule Hap.AccountsTest do
 
   describe "deliver_user_update_email_instructions/3" do
     setup do
-      %{user: user_fixture()}
+      [user: insert(:user)]
     end
 
-    test "sends token through notification", %{user: user} do
+    test "it sends the token through notification", %{user: user} do
       token =
         extract_user_token(fn url ->
           Accounts.deliver_user_update_email_instructions(user, "current@example.com", url)
@@ -197,20 +187,22 @@ defmodule Hap.AccountsTest do
 
   describe "update_user_email/2" do
     setup do
-      user = user_fixture()
-      email = unique_user_email()
+      user = insert(:user)
+      %{email: email} = build(:user)
 
       token =
         extract_user_token(fn url ->
           Accounts.deliver_user_update_email_instructions(%{user | email: email}, user.email, url)
         end)
 
-      %{user: user, token: token, email: email}
+      [email: email, token: token, user: user]
     end
 
-    test "updates the email with a valid token", %{user: user, token: token, email: email} do
+    test "it updates the email with a valid token", %{user: user, token: token, email: email} do
       assert Accounts.update_user_email(user, token) == :ok
+
       changed_user = Repo.get!(User, user.id)
+
       assert changed_user.email != user.email
       assert changed_user.email == email
       assert changed_user.confirmed_at
@@ -218,20 +210,21 @@ defmodule Hap.AccountsTest do
       refute Repo.get_by(UserToken, user_id: user.id)
     end
 
-    test "does not update email with invalid token", %{user: user} do
+    test "it does not update the email with an invalid token", %{user: user} do
       assert Accounts.update_user_email(user, "oops") == :error
       assert Repo.get!(User, user.id).email == user.email
       assert Repo.get_by(UserToken, user_id: user.id)
     end
 
-    test "does not update email if user email changed", %{user: user, token: token} do
+    test "it does not update the email if the user email changed", %{user: user, token: token} do
       assert Accounts.update_user_email(%{user | email: "current@example.com"}, token) == :error
       assert Repo.get!(User, user.id).email == user.email
       assert Repo.get_by(UserToken, user_id: user.id)
     end
 
-    test "does not update email if token expired", %{user: user, token: token} do
+    test "it does not update the email if the token expired", %{user: user, token: token} do
       {1, nil} = Repo.update_all(UserToken, set: [inserted_at: ~N[2020-01-01 00:00:00]])
+
       assert Accounts.update_user_email(user, token) == :error
       assert Repo.get!(User, user.id).email == user.email
       assert Repo.get_by(UserToken, user_id: user.id)
@@ -239,12 +232,12 @@ defmodule Hap.AccountsTest do
   end
 
   describe "change_user_password/2" do
-    test "returns a user changeset" do
+    test "it returns a user changeset" do
       assert %Ecto.Changeset{} = changeset = Accounts.change_user_password(%User{})
       assert changeset.required == [:password]
     end
 
-    test "allows fields to be set" do
+    test "it allows fields to be set" do
       changeset =
         Accounts.change_user_password(%User{}, %{
           "password" => "new valid password"
@@ -258,55 +251,56 @@ defmodule Hap.AccountsTest do
 
   describe "update_user_password/3" do
     setup do
-      %{user: user_fixture()}
+      password = "a valid password"
+      [password: password, user: insert(:user, password: password)]
     end
 
-    test "validates password", %{user: user} do
+    test "it validates the password", %{password: password, user: user} do
+      # Invalid
       {:error, changeset} =
-        Accounts.update_user_password(user, valid_user_password(), %{
-          password: "not valid",
-          password_confirmation: "another"
+        Accounts.update_user_password(user, password, %{
+          password: "invalid",
+          password_confirmation: "invalid"
         })
 
-      assert %{
-               password: ["should be at least 12 character(s)"],
-               password_confirmation: ["does not match password"]
-             } = errors_on(changeset)
-    end
+      assert %{password: ["should be at least 12 character(s)"]} = errors_on(changeset)
 
-    test "validates maximum values for password for security", %{user: user} do
-      too_long = String.duplicate("db", 100)
-
+      # Mismatched
       {:error, changeset} =
-        Accounts.update_user_password(user, valid_user_password(), %{password: too_long})
+        Accounts.update_user_password(user, password, %{
+          password: "perfectly_valid",
+          password_confirmation: "imperfectly_valid"
+        })
+
+      assert %{password_confirmation: ["does not match password"]} = errors_on(changeset)
+
+      # Too long
+      {:error, changeset} =
+        Accounts.update_user_password(user, password, %{password: String.duplicate("x", 73)})
 
       assert "should be at most 72 character(s)" in errors_on(changeset).password
     end
 
-    test "validates current password", %{user: user} do
+    test "it validates the current password", %{user: user} do
       {:error, changeset} =
-        Accounts.update_user_password(user, "invalid", %{password: valid_user_password()})
+        Accounts.update_user_password(user, "invalid", %{password: "new valid password"})
 
       assert %{current_password: ["is not valid"]} = errors_on(changeset)
     end
 
-    test "updates the password", %{user: user} do
-      {:ok, user} =
-        Accounts.update_user_password(user, valid_user_password(), %{
-          password: "new valid password"
-        })
+    test "it updates the password", %{password: password, user: user} do
+      {:ok, updated_user} =
+        Accounts.update_user_password(user, password, %{password: "new valid password"})
 
-      assert is_nil(user.password)
-      assert Accounts.get_user_by_email_and_password(user.email, "new valid password")
+      assert is_nil(updated_user.password)
+
+      assert Accounts.get_user_by_email_and_password(updated_user.email, "new valid password")
     end
 
-    test "deletes all tokens for the given user", %{user: user} do
+    test "it deletes all tokens for the given user", %{password: password, user: user} do
       _ = Accounts.generate_user_session_token(user)
 
-      {:ok, _} =
-        Accounts.update_user_password(user, valid_user_password(), %{
-          password: "new valid password"
-        })
+      {:ok, _} = Accounts.update_user_password(user, password, %{password: "new valid password"})
 
       refute Repo.get_by(UserToken, user_id: user.id)
     end
@@ -314,10 +308,10 @@ defmodule Hap.AccountsTest do
 
   describe "generate_user_session_token/1" do
     setup do
-      %{user: user_fixture()}
+      [user: insert(:user)]
     end
 
-    test "generates a token", %{user: user} do
+    test "it generates a token", %{user: user} do
       token = Accounts.generate_user_session_token(user)
       assert user_token = Repo.get_by(UserToken, token: token)
       assert user_token.context == "session"
@@ -326,7 +320,7 @@ defmodule Hap.AccountsTest do
       assert_raise Ecto.ConstraintError, fn ->
         Repo.insert!(%UserToken{
           token: user_token.token,
-          user_id: user_fixture().id,
+          user_id: insert(:user).id,
           context: "session"
         })
       end
@@ -335,29 +329,29 @@ defmodule Hap.AccountsTest do
 
   describe "get_user_by_session_token/1" do
     setup do
-      user = user_fixture()
+      user = insert(:user)
       token = Accounts.generate_user_session_token(user)
-      %{user: user, token: token}
+      [token: token, user: user]
     end
 
-    test "returns user by token", %{user: user, token: token} do
+    test "it returns the user by token", %{user: user, token: token} do
       assert session_user = Accounts.get_user_by_session_token(token)
       assert session_user.id == user.id
     end
 
-    test "does not return user for invalid token" do
+    test "it does not return a user for an invalid token" do
       refute Accounts.get_user_by_session_token("oops")
     end
 
-    test "does not return user for expired token", %{token: token} do
+    test "it does not return a user for an expired token", %{token: token} do
       {1, nil} = Repo.update_all(UserToken, set: [inserted_at: ~N[2020-01-01 00:00:00]])
       refute Accounts.get_user_by_session_token(token)
     end
   end
 
   describe "delete_user_session_token/1" do
-    test "deletes the token" do
-      user = user_fixture()
+    test "it deletes the token" do
+      user = insert(:user)
       token = Accounts.generate_user_session_token(user)
       assert Accounts.delete_user_session_token(token) == :ok
       refute Accounts.get_user_by_session_token(token)
@@ -366,10 +360,10 @@ defmodule Hap.AccountsTest do
 
   describe "deliver_user_confirmation_instructions/2" do
     setup do
-      %{user: user_fixture()}
+      [user: insert(:user)]
     end
 
-    test "sends token through notification", %{user: user} do
+    test "it sends the token through notification", %{user: user} do
       token =
         extract_user_token(fn url ->
           Accounts.deliver_user_confirmation_instructions(user, url)
@@ -385,17 +379,17 @@ defmodule Hap.AccountsTest do
 
   describe "confirm_user/1" do
     setup do
-      user = user_fixture()
+      user = insert(:user)
 
       token =
         extract_user_token(fn url ->
           Accounts.deliver_user_confirmation_instructions(user, url)
         end)
 
-      %{user: user, token: token}
+      [token: token, user: user]
     end
 
-    test "confirms the email with a valid token", %{user: user, token: token} do
+    test "it confirms the email with a valid token", %{user: user, token: token} do
       assert {:ok, confirmed_user} = Accounts.confirm_user(token)
       assert confirmed_user.confirmed_at
       assert confirmed_user.confirmed_at != user.confirmed_at
@@ -403,13 +397,13 @@ defmodule Hap.AccountsTest do
       refute Repo.get_by(UserToken, user_id: user.id)
     end
 
-    test "does not confirm with invalid token", %{user: user} do
+    test "it does not confirm with an invalid token", %{user: user} do
       assert Accounts.confirm_user("oops") == :error
       refute Repo.get!(User, user.id).confirmed_at
       assert Repo.get_by(UserToken, user_id: user.id)
     end
 
-    test "does not confirm email if token expired", %{user: user, token: token} do
+    test "it does not confirm the email if the token has expired", %{user: user, token: token} do
       {1, nil} = Repo.update_all(UserToken, set: [inserted_at: ~N[2020-01-01 00:00:00]])
       assert Accounts.confirm_user(token) == :error
       refute Repo.get!(User, user.id).confirmed_at
@@ -419,10 +413,10 @@ defmodule Hap.AccountsTest do
 
   describe "deliver_user_reset_password_instructions/2" do
     setup do
-      %{user: user_fixture()}
+      [user: insert(:user)]
     end
 
-    test "sends token through notification", %{user: user} do
+    test "it sends the token through notification", %{user: user} do
       token =
         extract_user_token(fn url ->
           Accounts.deliver_user_reset_password_instructions(user, url)
@@ -438,27 +432,27 @@ defmodule Hap.AccountsTest do
 
   describe "get_user_by_reset_password_token/1" do
     setup do
-      user = user_fixture()
+      user = insert(:user)
 
       token =
         extract_user_token(fn url ->
           Accounts.deliver_user_reset_password_instructions(user, url)
         end)
 
-      %{user: user, token: token}
+      [token: token, user: user]
     end
 
-    test "returns the user with valid token", %{user: %{id: id}, token: token} do
+    test "it returns the user with a valid token", %{user: %{id: id}, token: token} do
       assert %User{id: ^id} = Accounts.get_user_by_reset_password_token(token)
       assert Repo.get_by(UserToken, user_id: id)
     end
 
-    test "does not return the user with invalid token", %{user: user} do
+    test "it does not return the user with an invalid token", %{user: user} do
       refute Accounts.get_user_by_reset_password_token("oops")
       assert Repo.get_by(UserToken, user_id: user.id)
     end
 
-    test "does not return the user if token expired", %{user: user, token: token} do
+    test "it does not return the user if the token has expired", %{user: user, token: token} do
       {1, nil} = Repo.update_all(UserToken, set: [inserted_at: ~N[2020-01-01 00:00:00]])
       refute Accounts.get_user_by_reset_password_token(token)
       assert Repo.get_by(UserToken, user_id: user.id)
@@ -467,35 +461,40 @@ defmodule Hap.AccountsTest do
 
   describe "reset_user_password/2" do
     setup do
-      %{user: user_fixture()}
+      [user: insert(:user)]
     end
 
-    test "validates password", %{user: user} do
+    test "it validates the password", %{user: user} do
+      # Invalid
+      {:error, changeset} =
+        Accounts.reset_user_password(user, %{password: "nope", password_confirmation: "nope"})
+
+      assert %{password: ["should be at least 12 character(s)"]} = errors_on(changeset)
+
+      # Mismatched
       {:error, changeset} =
         Accounts.reset_user_password(user, %{
-          password: "not valid",
-          password_confirmation: "another"
+          password: "a valid password",
+          password_confirmation: "another valid password"
         })
 
-      assert %{
-               password: ["should be at least 12 character(s)"],
-               password_confirmation: ["does not match password"]
-             } = errors_on(changeset)
-    end
+      assert %{password_confirmation: ["does not match password"]} = errors_on(changeset)
 
-    test "validates maximum values for password for security", %{user: user} do
-      too_long = String.duplicate("db", 100)
-      {:error, changeset} = Accounts.reset_user_password(user, %{password: too_long})
+      # Too long
+      {:error, changeset} =
+        Accounts.reset_user_password(user, %{password: String.duplicate("x", 73)})
+
       assert "should be at most 72 character(s)" in errors_on(changeset).password
     end
 
-    test "updates the password", %{user: user} do
+    test "it updates the password", %{user: user} do
       {:ok, updated_user} = Accounts.reset_user_password(user, %{password: "new valid password"})
+
       assert is_nil(updated_user.password)
       assert Accounts.get_user_by_email_and_password(user.email, "new valid password")
     end
 
-    test "deletes all tokens for the given user", %{user: user} do
+    test "it deletes all tokens for the given user", %{user: user} do
       _ = Accounts.generate_user_session_token(user)
       {:ok, _} = Accounts.reset_user_password(user, %{password: "new valid password"})
       refute Repo.get_by(UserToken, user_id: user.id)
@@ -503,7 +502,7 @@ defmodule Hap.AccountsTest do
   end
 
   describe "inspect/2 for the User module" do
-    test "does not include password" do
+    test "it does not include the password" do
       refute inspect(%User{password: "123456"}) =~ "password: \"123456\""
     end
   end

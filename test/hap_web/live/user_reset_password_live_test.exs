@@ -2,12 +2,11 @@ defmodule HapWeb.UserResetPasswordLiveTest do
   use HapWeb.ConnCase, async: true
 
   import Phoenix.LiveViewTest
-  import Hap.AccountsFixtures
 
   alias Hap.Accounts
 
   setup do
-    user = user_fixture()
+    user = insert(:user)
 
     token =
       extract_user_token(fn url ->

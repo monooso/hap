@@ -1,17 +1,16 @@
 defmodule HapWeb.UserSessionControllerTest do
   use HapWeb.ConnCase, async: true
 
-  import Hap.AccountsFixtures
-
   setup do
-    %{user: user_fixture()}
+    password = "a very valid password"
+    [password: password, user: insert(:user, password: password)]
   end
 
   describe "POST /users/log_in" do
-    test "logs the user in", %{conn: conn, user: user} do
+    test "logs the user in", %{conn: conn, password: password, user: user} do
       conn =
         post(conn, ~p"/users/log_in", %{
-          "user" => %{"email" => user.email, "password" => valid_user_password()}
+          "user" => %{"email" => user.email, "password" => password}
         })
 
       assert get_session(conn, :user_token)
@@ -25,12 +24,12 @@ defmodule HapWeb.UserSessionControllerTest do
       assert response =~ ~p"/users/log_out"
     end
 
-    test "logs the user in with remember me", %{conn: conn, user: user} do
+    test "logs the user in with remember me", %{conn: conn, password: password, user: user} do
       conn =
         post(conn, ~p"/users/log_in", %{
           "user" => %{
             "email" => user.email,
-            "password" => valid_user_password(),
+            "password" => password,
             "remember_me" => "true"
           }
         })
@@ -39,45 +38,34 @@ defmodule HapWeb.UserSessionControllerTest do
       assert redirected_to(conn) == ~p"/"
     end
 
-    test "logs the user in with return to", %{conn: conn, user: user} do
+    test "logs the user in with return to", %{conn: conn, password: password, user: user} do
       conn =
         conn
         |> init_test_session(user_return_to: "/foo/bar")
-        |> post(~p"/users/log_in", %{
-          "user" => %{
-            "email" => user.email,
-            "password" => valid_user_password()
-          }
-        })
+        |> post(~p"/users/log_in", %{"user" => %{"email" => user.email, "password" => password}})
 
       assert redirected_to(conn) == "/foo/bar"
       assert Phoenix.Flash.get(conn.assigns.flash, :info) =~ "Welcome back!"
     end
 
-    test "login following registration", %{conn: conn, user: user} do
+    test "login following registration", %{conn: conn, password: password, user: user} do
       conn =
         conn
         |> post(~p"/users/log_in", %{
           "_action" => "registered",
-          "user" => %{
-            "email" => user.email,
-            "password" => valid_user_password()
-          }
+          "user" => %{"email" => user.email, "password" => password}
         })
 
       assert redirected_to(conn) == ~p"/"
       assert Phoenix.Flash.get(conn.assigns.flash, :info) =~ "Account created successfully"
     end
 
-    test "login following password update", %{conn: conn, user: user} do
+    test "login following password update", %{conn: conn, password: password, user: user} do
       conn =
         conn
         |> post(~p"/users/log_in", %{
           "_action" => "password_updated",
-          "user" => %{
-            "email" => user.email,
-            "password" => valid_user_password()
-          }
+          "user" => %{"email" => user.email, "password" => password}
         })
 
       assert redirected_to(conn) == ~p"/users/settings"

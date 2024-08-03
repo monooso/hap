@@ -5,6 +5,15 @@ defmodule Hap.Factory do
 
   use ExMachina.Ecto, repo: Hap.Repo
 
+  @doc """
+  Utility function used by various tests. Ported from the generated `AccountsFixtures` module.
+  """
+  def extract_user_token(fun) do
+    {:ok, captured_email} = fun.(&"[TOKEN]#{&1}[TOKEN]")
+    [_, token | _] = String.split(captured_email.text_body, "[TOKEN]")
+    token
+  end
+
   def event_factory do
     %Hap.Events.Event{
       category: Enum.random(["audit", "orders", "shipping"]),
@@ -35,5 +44,17 @@ defmodule Hap.Factory do
         %{category: "shipping"} -> %{shipment_id: Enum.random(1..10_000)}
       end
     }
+  end
+
+  def user_factory(attrs) do
+    password = Map.get(attrs, :password, "very_secure_password")
+    attrs = Map.delete(attrs, :password)
+
+    %Hap.Accounts.User{
+      email: "user_#{System.unique_integer()}@example.com",
+      hashed_password: fn -> Bcrypt.hash_pwd_salt(password) end
+    }
+    |> merge_attributes(attrs)
+    |> evaluate_lazy_attributes()
   end
 end

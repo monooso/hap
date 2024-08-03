@@ -2,13 +2,12 @@ defmodule HapWeb.UserConfirmationLiveTest do
   use HapWeb.ConnCase, async: true
 
   import Phoenix.LiveViewTest
-  import Hap.AccountsFixtures
 
   alias Hap.Accounts
   alias Hap.Repo
 
   setup do
-    %{user: user_fixture()}
+    %{user: insert(:user)}
   end
 
   describe "Confirm user" do

@@ -2,7 +2,6 @@ defmodule HapWeb.UserRegistrationLiveTest do
   use HapWeb.ConnCase, async: true
 
   import Phoenix.LiveViewTest
-  import Hap.AccountsFixtures
 
   describe "Registration page" do
     test "renders registration page", %{conn: conn} do
@@ -15,7 +14,7 @@ defmodule HapWeb.UserRegistrationLiveTest do
     test "redirects if already logged in", %{conn: conn} do
       result =
         conn
-        |> log_in_user(user_fixture())
+        |> log_in_user(insert(:user))
         |> live(~p"/users/register")
         |> follow_redirect(conn, "/")
 
@@ -40,8 +39,10 @@ defmodule HapWeb.UserRegistrationLiveTest do
     test "creates account and logs the user in", %{conn: conn} do
       {:ok, lv, _html} = live(conn, ~p"/users/register")
 
-      email = unique_user_email()
-      form = form(lv, "#registration_form", user: valid_user_attributes(email: email))
+      %{email: email} = build(:user)
+      password = "a very valid password"
+
+      form = form(lv, "#registration_form", user: %{"email" => email, "password" => password})
       render_submit(form)
       conn = follow_trigger_action(form, conn)
 
@@ -58,7 +59,7 @@ defmodule HapWeb.UserRegistrationLiveTest do
     test "renders errors for duplicated email", %{conn: conn} do
       {:ok, lv, _html} = live(conn, ~p"/users/register")
 
-      user = user_fixture(%{email: "test@email.com"})
+      user = insert(:user, email: "test@email.com")
 
       result =
         lv
