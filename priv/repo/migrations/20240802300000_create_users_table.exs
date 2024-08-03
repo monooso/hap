@@ -5,7 +5,7 @@ defmodule Hap.Repo.Migrations.CreateUsersTable do
 
   def change do
     create table(@table) do
-      timestamps(type: :utc_datetime)
+      timestamps()
 
       add :email, :citext, null: false
       add :hashed_password, :string, null: false

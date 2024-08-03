@@ -5,7 +5,7 @@ defmodule Hap.Repo.Migrations.CreateUsersTokensTable do
 
   def change do
     create table(@table) do
-      timestamps(type: :utc_datetime, updated_at: false)
+      timestamps(updated_at: false)
 
       add :user_id, references(:users, on_delete: :delete_all), null: false
 

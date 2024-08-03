@@ -11,6 +11,9 @@ config :hap,
   ecto_repos: [Hap.Repo],
   generators: [timestamp_type: :utc_datetime]
 
+# Configures the migrations
+config :hap, Hap.Repo, migration_timestamps: [type: :utc_datetime]
+
 # Configures the endpoint
 config :hap, HapWeb.Endpoint,
   url: [host: "localhost"],
