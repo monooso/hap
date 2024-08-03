@@ -1,47 +1,42 @@
 defmodule Hap.EventsTest do
-  use Hap.DataCase
+  use Hap.DataCase, async: true
 
   alias Hap.Events
+  alias Hap.Events.Event
 
-  describe "events" do
-    alias Hap.Events.Event
-
-    import Hap.EventsFixtures
-
-    @invalid_attrs %{name: nil, category: nil, payload: nil}
-
-    test "list_events/0 returns all events" do
-      event = event_fixture()
-      assert Events.list_events() == [event]
+  describe "create_event/1" do
+    setup do
+      [
+        params: %{
+          "category" => "testing_hap",
+          "name" => "testing_create_event",
+          "organization_id" => insert(:organization).id,
+          "payload" => %{"valid" => true}
+        }
+      ]
     end
 
-    test "get_event!/1 returns the event with given id" do
-      event = event_fixture()
-      assert Events.get_event!(event.id) == event
+    test "it returns an {:ok, event} tuple when given valid params", %{params: params} do
+      assert {:ok, %Event{}} = Events.create_event(params)
     end
 
-    test "create_event/1 with valid data creates a event" do
-      valid_attrs = %{name: "some name", category: "some category", payload: %{}}
+    test "it creates an event with the given params", %{params: params} do
+      {:ok, event} = Events.create_event(params)
 
-      assert {:ok, %Event{} = event} = Events.create_event(valid_attrs)
-      assert event.name == "some name"
-      assert event.category == "some category"
-      assert event.payload == %{}
+      assert event.id
+      assert event.category == params["category"]
+      assert event.name == params["name"]
+      assert event.payload == params["payload"]
     end
 
-    test "create_event/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Events.create_event(@invalid_attrs)
+    test "it returns an {:error, changeset} tuple when given invalid params" do
+      assert {:error, %Ecto.Changeset{}} = Events.create_event(%{})
     end
+  end
 
-    test "delete_event/1 deletes the event" do
-      event = event_fixture()
-      assert {:ok, %Event{}} = Events.delete_event(event)
-      assert_raise Ecto.NoResultsError, fn -> Events.get_event!(event.id) end
-    end
-
-    test "change_event/1 returns a event changeset" do
-      event = event_fixture()
-      assert %Ecto.Changeset{} = Events.change_event(event)
+  describe "create_event_changeset/1" do
+    test "it returns an Ecto.Changeset struct" do
+      assert %Ecto.Changeset{data: %Event{}} = Events.create_event_changeset(%{})
     end
   end
 end

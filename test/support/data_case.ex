@@ -20,10 +20,8 @@ defmodule Hap.DataCase do
     quote do
       alias Hap.Repo
 
-      import Ecto
-      import Ecto.Changeset
-      import Ecto.Query
       import Hap.DataCase
+      import Hap.Factory
     end
   end
 
@@ -55,4 +53,10 @@ defmodule Hap.DataCase do
       end)
     end)
   end
+
+  @doc """
+  Returns a boolean indicating whether the given changeset is valid.
+  """
+  def valid_changeset?(%Ecto.Changeset{valid?: valid?}), do: valid?
+  def valid_changeset?(_), do: false
 end

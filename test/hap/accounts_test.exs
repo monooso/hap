@@ -1,10 +1,12 @@
 defmodule Hap.AccountsTest do
   use Hap.DataCase
 
-  alias Hap.Accounts
-
+  import Ecto.Changeset, only: [get_change: 2]
   import Hap.AccountsFixtures
-  alias Hap.Accounts.{User, UserToken}
+
+  alias Hap.Accounts
+  alias Hap.Accounts.User
+  alias Hap.Accounts.UserToken
 
   describe "get_user_by_email/1" do
     test "does not return the user if the email does not exist" do

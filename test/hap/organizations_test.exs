@@ -1,66 +1,44 @@
 defmodule Hap.OrganizationsTest do
-  use Hap.DataCase
+  use Hap.DataCase, async: true
 
   alias Hap.Organizations
+  alias Hap.Organizations.Organization
 
-  describe "organizations" do
-    alias Hap.Organizations.Organization
-
-    import Hap.OrganizationsFixtures
-
-    @invalid_attrs %{name: nil}
-
-    test "list_organizations/0 returns all organizations" do
-      organization = organization_fixture()
-      assert Organizations.list_organizations() == [organization]
+  describe "create_organization/1" do
+    setup do
+      [params: %{"name" => "Hap Industries"}]
     end
 
-    test "get_organization!/1 returns the organization with given id" do
-      organization = organization_fixture()
-      assert Organizations.get_organization!(organization.id) == organization
+    test "it returns an {:ok, organization} tuple when given valid params", %{params: params} do
+      assert {:ok, %Organization{}} = Organizations.create_organization(params)
     end
 
-    test "create_organization/1 with valid data creates a organization" do
-      valid_attrs = %{name: "some name"}
+    test "it creates an organization with the given params", %{params: params} do
+      {:ok, organization} = Organizations.create_organization(params)
 
-      assert {:ok, %Organization{} = organization} =
-               Organizations.create_organization(valid_attrs)
-
-      assert organization.name == "some name"
+      assert organization.id
+      assert organization.name == params["name"]
     end
 
-    test "create_organization/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Organizations.create_organization(@invalid_attrs)
+    test "it returns an {:error, changeset} tuple when given invalid params" do
+      assert {:error, %Ecto.Changeset{}} = Organizations.create_organization(%{})
     end
+  end
 
-    test "update_organization/2 with valid data updates the organization" do
-      organization = organization_fixture()
-      update_attrs = %{name: "some updated name"}
-
-      assert {:ok, %Organization{} = organization} =
-               Organizations.update_organization(organization, update_attrs)
-
-      assert organization.name == "some updated name"
+  describe "create_organization_changeset/1" do
+    test "it returns an Ecto.Changeset struct" do
+      assert %Ecto.Changeset{data: %Organization{}} =
+               Organizations.create_organization_changeset(%{})
     end
+  end
 
-    test "update_organization/2 with invalid data returns error changeset" do
-      organization = organization_fixture()
+  describe "list_organizations/0" do
+    test "it returns a list of organizations, ordered by name" do
+      insert(:organization, name: "Zulu")
+      insert(:organization, name: "Alpha")
 
-      assert {:error, %Ecto.Changeset{}} =
-               Organizations.update_organization(organization, @invalid_attrs)
-
-      assert organization == Organizations.get_organization!(organization.id)
-    end
-
-    test "delete_organization/1 deletes the organization" do
-      organization = organization_fixture()
-      assert {:ok, %Organization{}} = Organizations.delete_organization(organization)
-      assert_raise Ecto.NoResultsError, fn -> Organizations.get_organization!(organization.id) end
-    end
-
-    test "change_organization/1 returns a organization changeset" do
-      organization = organization_fixture()
-      assert %Ecto.Changeset{} = Organizations.change_organization(organization)
+      assert [%Organization{name: "Alpha"}, %Organization{name: "Zulu"}] =
+               Organizations.list_organizations()
     end
   end
 end
