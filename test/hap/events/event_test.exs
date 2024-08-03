@@ -9,7 +9,6 @@ defmodule Hap.Events.EventTest do
         params: %{
           "category" => "testing_hap",
           "name" => "testing_create_event",
-          "organization_id" => insert(:organization).id,
           "payload" => %{"valid" => true}
         }
       ]
@@ -71,22 +70,6 @@ defmodule Hap.Events.EventTest do
                errors_on(changeset)
     end
 
-    test "it validates the organization_id parameter", %{params: params} do
-      # Missing
-      changeset = params |> Map.delete("organization_id") |> insert_changeset()
-      refute valid_changeset?(changeset)
-      assert %{organization_id: ["Please specify the organization"]} = errors_on(changeset)
-
-      # Does not exist
-      {:error, changeset} =
-        %{params | "organization_id" => 90_210}
-        |> insert_changeset()
-        |> perform_insert()
-
-      assert %{organization_id: ["The specified organization does not exist"]} =
-               errors_on(changeset)
-    end
-
     test "it validates the payload parameter", %{params: params} do
       # Missing is okay
       changeset = params |> Map.delete("payload") |> insert_changeset()
@@ -100,6 +83,4 @@ defmodule Hap.Events.EventTest do
   end
 
   defp insert_changeset(params), do: Event.insert_changeset(%Event{}, params)
-
-  defp perform_insert(changeset), do: Hap.Repo.insert(changeset)
 end

@@ -36,10 +36,4 @@ defmodule Hap.Factory do
       end
     }
   end
-
-  def organization_factory do
-    %Hap.Organizations.Organization{
-      name: sequence(:name, &"Organization #{&1}")
-    }
-  end
 end

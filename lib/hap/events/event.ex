@@ -6,8 +6,6 @@ defmodule Hap.Events.Event do
   @type t() :: %__MODULE__{}
 
   schema "events" do
-    belongs_to :organization, Hap.Organizations.Organization
-
     field :name, :string
     field :category, :string
     field :payload, :map
@@ -20,7 +18,7 @@ defmodule Hap.Events.Event do
   """
   @spec insert_changeset(t() | Changeset.t(), map()) :: Changeset.t()
   def insert_changeset(struct_or_changeset, params) do
-    permitted = [:category, :name, :organization_id, :payload]
+    permitted = [:category, :name, :payload]
 
     messages = [
       category: "The category must be a string",
@@ -30,10 +28,9 @@ defmodule Hap.Events.Event do
 
     struct_or_changeset
     |> cast_with_messages(params, permitted, messages: messages)
-    |> validate_required([:category, :name, :organization_id])
+    |> validate_required([:category, :name])
     |> validate_category()
     |> validate_name()
-    |> validate_organization()
   end
 
   defp validate_category(changeset) do
@@ -47,12 +44,6 @@ defmodule Hap.Events.Event do
     validate_length(changeset, :name,
       max: 255,
       message: "The name cannot be longer than 255 characters"
-    )
-  end
-
-  defp validate_organization(changeset) do
-    foreign_key_constraint(changeset, :organization_id,
-      message: "The specified organization does not exist"
     )
   end
 end

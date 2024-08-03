@@ -10,7 +10,6 @@ defmodule Hap.EventsTest do
         params: %{
           "category" => "testing_hap",
           "name" => "testing_create_event",
-          "organization_id" => insert(:organization).id,
           "payload" => %{"valid" => true}
         }
       ]
