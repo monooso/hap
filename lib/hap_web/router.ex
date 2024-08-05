@@ -23,10 +23,12 @@ defmodule HapWeb.Router do
     get "/", PageController, :home
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", HapWeb do
-  #   pipe_through :api
-  # end
+  # API endpoints
+  scope "/api", HapWeb.Api do
+    pipe_through :api
+
+    post "/events", EventController, :new
+  end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:hap, :dev_routes) do
