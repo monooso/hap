@@ -37,11 +37,15 @@ defmodule Hap.Factory do
             "collected_by_courier",
             "delivered"
           ])
+
+        _ ->
+          sequence(:name, &"event_name_#{&1}")
       end,
       payload: fn
         %{category: "audit"} -> %{user_id: Enum.random(1..10_000)}
         %{category: "orders"} -> %{order_id: Enum.random(1..10_000)}
         %{category: "shipping"} -> %{shipment_id: Enum.random(1..10_000)}
+        _ -> %{}
       end
     }
   end
