@@ -47,6 +47,13 @@ defmodule HapWeb.Router do
     end
   end
 
+  ## Events dashboard routes
+  scope "/", HapWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live "/dashboard", EventStreamLive, :index
+  end
+
   ## Authentication routes
 
   scope "/", HapWeb do

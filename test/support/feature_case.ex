@@ -12,6 +12,7 @@ defmodule HapWeb.FeatureCase do
     quote do
       use HapWeb, :verified_routes
 
+      import HapWeb.ConnCase, only: [log_in_user: 2, register_and_log_in_user: 1]
       import HapWeb.FeatureCase
 
       import PhoenixTest
