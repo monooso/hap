@@ -14,6 +14,13 @@ defmodule Hap.Factory do
     token
   end
 
+  def api_token_factory do
+    %Hap.ApiTokens.ApiToken{
+      name: sequence(:name, &"API token #{&1}"),
+      token: sequence(:token, &"api_token_#{&1}")
+    }
+  end
+
   def event_factory do
     %Hap.Events.Event{
       category: Enum.random(["audit", "orders", "shipping"]),
